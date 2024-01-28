@@ -2,7 +2,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/models/todo_data.dart';
 
-//TODO: All these parameters will be set in model of TODO list
 class CustomListCard extends StatelessWidget {
   final String? title;
   final int? tasks;
@@ -13,7 +12,7 @@ class CustomListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return createNew ? NewCard(onTap: onTap) : Container();
+    return createNew ? NewCard(onTap: onTap) : TaskListCard(todo: null, onTap: onTap);
   }
 }
 
@@ -40,7 +39,7 @@ class NewCard extends StatelessWidget {
 }
 
 class TaskListCard extends StatelessWidget {
-  final TodoData todo;
+  final TodoData? todo;
   final VoidCallback onTap;
 
   const TaskListCard({super.key, required this.todo, required this.onTap});
@@ -48,7 +47,7 @@ class TaskListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Icon getIconFromTitle() {
-      switch (todo.category) {
+      switch (todo?.category) {
         case 'Personal':
           return Icon(Icons.person, color: kPersonal);
         case 'Work':

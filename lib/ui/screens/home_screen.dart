@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
@@ -9,12 +10,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String timeOfDay = '';
   String dateOfToday = '';
-  int numberOfTasks = 3;
 
   late CarouselController _carouselController;
   ValueNotifier<Color> backgroundColorNotifier = ValueNotifier<Color>(kPersonal);
@@ -38,63 +38,55 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _carouselController = CarouselController();
   }
 
+  void _handleOnTap() {}
+
   @override
   Widget build(BuildContext context) {
-    Color? getColorFromNumber(int number) {
-      switch (number) {
-        case 0:
-          return kPersonal;
-        case 1:
-          return kWork;
-        case 2:
-          return kBucket;
-        default:
-          return kPersonal;
-      }
-    }
-
     double availableHeight =
         MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - 315;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: backgroundColorNotifier.value,
-      appBar: _buildAppBar(),
-      body: SafeArea(
-        top: false,
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeMessage(),
-            Expanded(
-              child: CarouselSlider(
-                carouselController: _carouselController,
-                /*TODO: This list should be dynamically made for each
-                         category + have empty card for creating new card */
-                items: [
-                  CustomListCard(title: 'Personal', onTap: () => print('TEST'), tasks: 1),
-                  CustomListCard(
-                    createNew: true,
-                    onTap: () => _scaffoldKey.currentState!.showBottomSheet<void>(
-                      (BuildContext context) {
-                        return CustomCreateSheet();
-                      },
-                    ),
+    return AnimatedBuilder(
+      animation: backgroundColorNotifier,
+      builder: (context, _) => Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: backgroundColorNotifier.value,
+        appBar: _buildAppBar(),
+        body: SafeArea(
+          top: false,
+          bottom: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcomeMessage(),
+              Expanded(
+                child: CarouselSlider(
+                  carouselController: _carouselController,
+                  items: [
+                    CustomListCard(title: 'Personal', onTap: () => _handleOnTap, tasks: 1),
+                    CustomListCard(title: 'Work', onTap: () => _handleOnTap, tasks: 3),
+                    //TODO: Add newly created cards here
+                    // CustomListCard(
+                    //   createNew: true,
+                    //   onTap: () => _scaffoldKey.currentState!.showBottomSheet<void>(
+                    //     (BuildContext context) {
+                    //       return CustomCreateSheet();
+                    //     },
+                    //   ),
+                    // ),
+                  ],
+                  options: CarouselOptions(
+                    height: availableHeight,
+                    enableInfiniteScroll: false,
+                    enlargeCenterPage: true,
+                    onPageChanged: (index, reason) {
+                      backgroundColorNotifier.value = ColorUtils.getColorFromIndex(index);
+                    },
                   ),
-                ],
-                options: CarouselOptions(
-                  height: availableHeight,
-                  enableInfiniteScroll: false,
-                  enlargeCenterPage: true,
-                  onPageChanged: (index, reason) {
-                    backgroundColorNotifier.value = getColorFromNumber(index)!;
-                  },
                 ),
               ),
-            ),
-            Gap(kLarge),
-          ],
+              Gap(kLarge),
+            ],
+          ),
         ),
       ),
     );
@@ -112,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Text('Hello, Daniel.', style: kHeader),
           Gap(kExtraExtraSmall),
           Text('Good $timeOfDay!', style: kSubHeader),
-          Text('You have $numberOfTasks tasks due today.', style: kSubHeader),
+          Text('You have 0 tasks due today.', style: kSubHeader),
           Gap(kLarge),
           Text('Today: $dateOfToday', style: kSubHeader.copyWith(fontWeight: FontWeight.w900, fontSize: kSmall)),
           Gap(kSmall),

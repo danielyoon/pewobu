@@ -1,12 +1,15 @@
+//TODO: Create dependency structure
+
 class Task {
-  final String title, description;
+  final String title, description, subcategory;
   bool isCompleted;
   DateTime created;
   DateTime? due, completed;
 
   Task(
       {required this.title,
-      required this.description,
+      this.description = '',
+      required this.subcategory,
       this.isCompleted = false,
       required this.created,
       this.completed,
