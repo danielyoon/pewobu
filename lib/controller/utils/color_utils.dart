@@ -9,7 +9,7 @@ class ColorUtils {
       case 1:
         return kWork;
       case 2:
-        return kGrey;
+        return kBucket;
       default:
         return kGrey;
     }

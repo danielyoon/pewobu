@@ -113,14 +113,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  dotted_border:
-    dependency: "direct main"
-    description:
-      name: dotted_border
-      sha256: "108837e11848ca776c53b30bc870086f84b62ed6e01c503ed976e8f8c7df9c04"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -184,14 +176,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  functional_listener:
-    dependency: transitive
-    description:
-      name: functional_listener
-      sha256: "026d1bd4f66367f11d9ec9f1f1ddb42b89e4484b356972c76d983266cf82f33f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
   gap:
     dependency: "direct main"
     description:
@@ -200,22 +184,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  get_it:
-    dependency: "direct main"
-    description:
-      name: get_it
-      sha256: e6017ce7fdeaf218dc51a100344d8cb70134b80e28b760f8bb23c242437bafd7
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.6.7"
-  get_it_mixin:
-    dependency: "direct main"
-    description:
-      name: get_it_mixin
-      sha256: "0ab5c9f3cdaab813ec396de5d43ee3833c418424b3a99bec0071fcbf693c0bad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.2"
   go_router:
     dependency: "direct main"
     description:
@@ -336,6 +304,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: transitive
     description:
@@ -344,22 +320,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
-  path_drawing:
-    dependency: transitive
-    description:
-      name: path_drawing
-      sha256: bbb1934c0cbb03091af082a6389ca2080345291ef07a5fa6d6e078ba8682f977
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  path_parsing:
-    dependency: transitive
-    description:
-      name: path_parsing
-      sha256: e3e67b1629e6f7e8100b367d3db6ba6af4b1f0bb80f64db18ef1fbabd2fa9ccf
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   path_provider:
     dependency: transitive
     description:
@@ -440,6 +400,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.7.4"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.1"
   shared_preferences:
     dependency: "direct main"
     description:

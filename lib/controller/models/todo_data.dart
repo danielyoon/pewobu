@@ -4,8 +4,8 @@ import 'package:todo_list/controller/models/task.dart';
 
 class TodoData {
   final String category;
-  SplayTreeSet<String> subcategory = SplayTreeSet<String>();
-  List<Task> tasks = [];
+  SplayTreeSet<String> subcategory;
+  List<Task> tasks;
 
   TodoData({required this.category, required this.subcategory, required this.tasks});
 
@@ -19,5 +19,21 @@ class TodoData {
     if (!tasks.any((t) => t.subcategory == task.subcategory)) {
       subcategory.remove(task.subcategory);
     }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'category': category,
+      'subcategory': subcategory.toList(),
+      'tasks': tasks.map((task) => task.toJson()).toList(),
+    };
+  }
+
+  factory TodoData.fromJson(Map<String, dynamic> jsonData) {
+    return TodoData(
+      category: jsonData['category'],
+      subcategory: SplayTreeSet<String>.from(jsonData['subcategory']),
+      tasks: List<Task>.from(jsonData['tasks'].map((task) => Task.fromJson(task))),
+    );
   }
 }

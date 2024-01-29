@@ -1,7 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:todo_list/controller/logic/todo_list_logic.dart';
+import 'package:todo_list/controller/models/todo_data.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
+import 'package:todo_list/controller/utils/string_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_list/router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,14 +14,17 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late AnimationController _animationController;
+  late Animation<Color?> _animation;
+  final ValueNotifier<Color> _backgroundColor = ValueNotifier<Color>(kPersonal);
 
   String timeOfDay = '';
   String dateOfToday = '';
 
+  int currentIndex = 0;
   late CarouselController _carouselController;
-  ValueNotifier<Color> backgroundColorNotifier = ValueNotifier<Color>(kPersonal);
 
   @override
   void initState() {
@@ -36,83 +43,83 @@ class _HomeScreenState extends State<HomeScreen> {
 
     dateOfToday = DateFormat('MMMM dd, yyyy').format(now).toUpperCase();
     _carouselController = CarouselController();
+
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _animation = ColorTween(
+      begin: kPersonal,
+      end: Colors.blue,
+    ).animate(_animationController);
+
+    _backgroundColor.addListener(() {
+      _animation = ColorTween(
+        begin: _animation.value,
+        end: _backgroundColor.value,
+      ).animate(_animationController);
+
+      _animationController.forward(from: 0.0);
+    });
   }
 
-  void _handleOnTap() {}
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _backgroundColor.dispose();
+    super.dispose();
+  }
+
+  void changeBackground(int index) {
+    _backgroundColor.value = ColorUtils.getColorFromIndex(index);
+  }
+
+  void _handleOnTap(int index) {
+    if (currentIndex == index) appRouter.push('/task/${StringUtils.getTitleFromIndex(index)}');
+    _carouselController.animateToPage(index);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final todoLogic = Provider.of<TodoListLogic>(context);
+    TodoData personal = todoLogic.personalList;
+    TodoData work = todoLogic.workList;
+    TodoData bucket = todoLogic.bucketList;
+
+    int numberOfTasks = todoLogic.getDueTodayTasks();
+
     double availableHeight =
         MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - 315;
 
-    return AnimatedBuilder(
-      animation: backgroundColorNotifier,
-      builder: (context, _) => Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: backgroundColorNotifier.value,
-        appBar: _buildAppBar(),
-        body: SafeArea(
-          top: false,
-          bottom: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWelcomeMessage(),
-              Expanded(
-                child: CarouselSlider(
-                  carouselController: _carouselController,
-                  items: [
-                    CustomListCard(title: 'Personal', onTap: () => _handleOnTap, tasks: 1),
-                    CustomListCard(title: 'Work', onTap: () => _handleOnTap, tasks: 3),
-                    //TODO: Add newly created cards here
-                    // CustomListCard(
-                    //   createNew: true,
-                    //   onTap: () => _scaffoldKey.currentState!.showBottomSheet<void>(
-                    //     (BuildContext context) {
-                    //       return CustomCreateSheet();
-                    //     },
-                    //   ),
-                    // ),
-                  ],
-                  options: CarouselOptions(
-                    height: availableHeight,
-                    enableInfiniteScroll: false,
-                    enlargeCenterPage: true,
-                    onPageChanged: (index, reason) {
-                      backgroundColorNotifier.value = ColorUtils.getColorFromIndex(index);
-                    },
-                  ),
-                ),
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: _buildAppBar(),
+      extendBodyBehindAppBar: true,
+      body: AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return SafeArea(
+            top: false,
+            child: Container(
+              color: _animation.value,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Gap(kToolbarHeight + kSmall),
+                  _buildWelcomeMessage(numberOfTasks),
+                  _buildCarouselList(personal, work, bucket, availableHeight),
+                  Gap(kLarge),
+                ],
               ),
-              Gap(kLarge),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Padding _buildWelcomeMessage() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: kLarge + 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Gap(kSmall),
-          CustomCircleAvatar(),
-          Gap(kLarge),
-          Text('Hello, Daniel.', style: kHeader),
-          Gap(kExtraExtraSmall),
-          Text('Good $timeOfDay!', style: kSubHeader),
-          Text('You have 0 tasks due today.', style: kSubHeader),
-          Gap(kLarge),
-          Text('Today: $dateOfToday', style: kSubHeader.copyWith(fontWeight: FontWeight.w900, fontSize: kSmall)),
-          Gap(kSmall),
-        ],
-      ),
-    );
-  }
-
+  //TODO: Build side drawer (but for what use?)
   AppBar _buildAppBar() {
     return AppBar(
       title: Text('TODO', style: kSubHeader.copyWith(fontSize: kSmall + 2)),
@@ -122,6 +129,49 @@ class _HomeScreenState extends State<HomeScreen> {
       leading: IconButton(
         icon: Icon(Icons.menu_rounded, color: kWhite),
         onPressed: () => print('Open Drawer!'),
+      ),
+    );
+  }
+
+  Padding _buildWelcomeMessage(int numberOfTasks) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: kLarge + 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Gap(kSmall),
+          CustomCircleAvatar(),
+          Gap(kMedium),
+          Text('Hello, Daniel.', style: kHeader),
+          Gap(kExtraExtraSmall),
+          Text('Good $timeOfDay!', style: kSubHeader),
+          Text('You have $numberOfTasks tasks due today.', style: kSubHeader),
+          Gap(kLarge),
+          Text('Today: $dateOfToday', style: kSubHeader.copyWith(fontWeight: FontWeight.w900, fontSize: kSmall)),
+          Gap(kSmall),
+        ],
+      ),
+    );
+  }
+
+  Expanded _buildCarouselList(TodoData personal, TodoData work, TodoData bucket, double availableHeight) {
+    return Expanded(
+      child: CarouselSlider(
+        carouselController: _carouselController,
+        items: [
+          CustomListCard(data: personal, index: 0, onTap: () => _handleOnTap(0)),
+          CustomListCard(data: work, index: 1, onTap: () => _handleOnTap(1)),
+          CustomListCard(data: bucket, index: 2, onTap: () => _handleOnTap(2)),
+        ],
+        options: CarouselOptions(
+          height: availableHeight,
+          enableInfiniteScroll: false,
+          enlargeCenterPage: true,
+          onPageChanged: (index, reason) {
+            currentIndex = index;
+            _backgroundColor.value = ColorUtils.getColorFromIndex(index);
+          },
+        ),
       ),
     );
   }

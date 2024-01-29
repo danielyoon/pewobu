@@ -1,17 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list/router.dart';
+import 'package:todo_list/controller/logic/todo_list_logic.dart';
 
-void main() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  registerSingletons();
+  TodoListLogic todoListLogic = TodoListLogic();
+  await todoListLogic.loadTodoData();
 
-  // FlutterNativeSplash.remove();
-
-  runApp(const NoNameList());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => todoListLogic,
+      child: const NoNameList(),
+    ),
+  );
 }
 
 class NoNameList extends StatelessWidget {
@@ -23,5 +27,3 @@ class NoNameList extends StatelessWidget {
         routerConfig: appRouter,
       );
 }
-
-void registerSingletons() {}
