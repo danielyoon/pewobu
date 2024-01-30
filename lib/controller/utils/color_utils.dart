@@ -14,4 +14,17 @@ class ColorUtils {
         return kGrey;
     }
   }
+
+  static Color getColorFromTitle(String title) {
+    switch (title.toLowerCase()) {
+      case 'personal':
+        return kPersonal;
+      case 'work':
+        return kWork;
+      case 'bucket':
+        return kBucket;
+      default:
+        return kGrey;
+    }
+  }
 }

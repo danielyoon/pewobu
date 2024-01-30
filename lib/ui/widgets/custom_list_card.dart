@@ -1,3 +1,4 @@
+import 'package:todo_list/controller/logic/todo_list_logic.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/models/todo_data.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
@@ -29,6 +30,10 @@ class CustomListCard extends StatelessWidget {
       }
     }
 
+    final todoLogic = Provider.of<TodoListLogic>(context, listen: true);
+    int uncompletedTasks = todoLogic.getUncompletedTasks(data.category);
+    int completedTasks = todoLogic.getCompletedTasks(data.category);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -52,26 +57,26 @@ class CustomListCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Gap(kMedium),
-              Hero(
-                tag: '${data.category}-icon',
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(kExtraExtraSmall),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: kGrey.withOpacity(.4)),
-                      ),
-                      child: getIconFromTitle(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(kExtraExtraSmall),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: kGrey.withOpacity(.4)),
                     ),
-                    Icon(Icons.more_vert_rounded, color: kGrey),
-                  ],
-                ),
+                    child: getIconFromTitle(),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.more_vert_rounded, color: kGrey),
+                    onPressed: () => print('Open sort list'),
+                  )
+                ],
               ),
               Spacer(),
-              Text('${'1'} Tasks', style: kSubHeader.copyWith(color: kGrey)),
-              Text('1', style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+              Text('$uncompletedTasks Tasks', style: kSubHeader.copyWith(color: kGrey)),
+              Text(data.category, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
               Gap(kMedium),
               Row(
                 children: [
@@ -80,7 +85,8 @@ class CustomListCard extends StatelessWidget {
                         completionPercentage: ((1 / 17) * 100).round(), color: ColorUtils.getColorFromIndex(index)),
                   ),
                   Gap(kExtraExtraSmall),
-                  Text('${((1 / 17) * 100).round()}%'),
+                  Text(
+                      '${(uncompletedTasks + completedTasks) == 0 ? 0 : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round()}%'),
                 ],
               ),
               Gap(kMedium),

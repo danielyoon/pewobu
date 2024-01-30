@@ -5,7 +5,6 @@ import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/controller/utils/string_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_list/router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -82,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final todoLogic = Provider.of<TodoListLogic>(context);
+    final todoLogic = Provider.of<TodoListLogic>(context, listen: true);
     TodoData personal = todoLogic.personalList;
     TodoData work = todoLogic.workList;
     TodoData bucket = todoLogic.bucketList;
@@ -99,19 +98,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          return SafeArea(
-            top: false,
-            child: Container(
-              color: _animation.value,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Gap(kToolbarHeight + kSmall),
-                  _buildWelcomeMessage(numberOfTasks),
-                  _buildCarouselList(personal, work, bucket, availableHeight),
-                  Gap(kLarge),
-                ],
-              ),
+          return Container(
+            color: _animation.value,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Gap(kToolbarHeight + kSmall),
+                _buildWelcomeMessage(numberOfTasks),
+                _buildCarouselList(personal, work, bucket, availableHeight),
+                Gap(kLarge),
+              ],
             ),
           );
         },
@@ -119,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  //TODO: Build side drawer (but for what use?)
+  //TODO: Build side drawer change image/name, toggle dark mode
   AppBar _buildAppBar() {
     return AppBar(
       title: Text('TODO', style: kSubHeader.copyWith(fontSize: kSmall + 2)),
@@ -154,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
+  //TODO: Add transition effect to next page // Try animatedContainer? Hero widget?
   Expanded _buildCarouselList(TodoData personal, TodoData work, TodoData bucket, double availableHeight) {
     return Expanded(
       child: CarouselSlider(

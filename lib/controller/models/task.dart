@@ -1,5 +1,5 @@
 class Task {
-  final String title, description, subcategory;
+  final String title, subcategory;
   bool isCompleted;
   DateTime created;
   DateTime? due, completed;
@@ -7,7 +7,6 @@ class Task {
 
   Task(
       {required this.title,
-      this.description = '',
       required this.subcategory,
       this.isCompleted = false,
       required this.created,
@@ -18,7 +17,6 @@ class Task {
   Map<String, dynamic> toJson() {
     return {
       'title': title,
-      'description': description,
       'subcategory': subcategory,
       'isCompleted': isCompleted,
       'created': created.toIso8601String(),
@@ -31,7 +29,6 @@ class Task {
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       title: json['title'],
-      description: json['description'] ?? '',
       subcategory: json['subcategory'],
       isCompleted: json['isCompleted'] ?? false,
       created: DateTime.parse(json['created']),

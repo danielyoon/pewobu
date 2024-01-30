@@ -24,6 +24,30 @@ class TodoListLogic extends ChangeNotifier {
         _countDueTasks(bucketList.tasks, now);
   }
 
+  int getUncompletedTasks(String title) {
+    if (title == 'personal') return _countUncompletedTasks(personalList.tasks);
+    if (title == 'work') return _countUncompletedTasks(workList.tasks);
+    if (title == 'bucket') return _countUncompletedTasks(bucketList.tasks);
+
+    return 0;
+  }
+
+  int getCompletedTasks(String title) {
+    if (title == 'personal') return _countCompletedTasks(personalList.tasks);
+    if (title == 'work') return _countCompletedTasks(workList.tasks);
+    if (title == 'bucket') return _countCompletedTasks(bucketList.tasks);
+
+    return 0;
+  }
+
+  Set<String> getExistingCategories() {
+    return {
+      ...personalList.tasks.map((task) => task.subcategory),
+      ...workList.tasks.map((task) => task.subcategory),
+      ...bucketList.tasks.map((task) => task.subcategory),
+    };
+  }
+
   Future<void> saveTodoData() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -61,5 +85,13 @@ class TodoListLogic extends ChangeNotifier {
         .where((task) =>
             task.due != null && task.due!.year == now.year && task.due!.month == now.month && task.due!.day == now.day)
         .length;
+  }
+
+  int _countCompletedTasks(List<Task> tasks) {
+    return tasks.where((task) => task.isCompleted).length;
+  }
+
+  int _countUncompletedTasks(List<Task> tasks) {
+    return tasks.where((task) => !task.isCompleted).length;
   }
 }
