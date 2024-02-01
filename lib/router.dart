@@ -9,15 +9,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => HomeScreen(),
-      routes: [
-        GoRoute(
-          path: 'task/:title',
-          builder: (BuildContext context, GoRouterState state) {
-            final title = state.pathParameters['title'];
-            return TodoScreen(title: title!);
-          },
-        )
-      ],
     ),
   ],
 );

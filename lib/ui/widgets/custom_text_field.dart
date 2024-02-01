@@ -37,6 +37,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       autofocus: widget.autoFocus,
       minLines: widget.numLines,
       maxLines: widget.numLines,
+      textCapitalization: TextCapitalization.sentences,
       cursorColor: kGrey,
       style: kBodyText,
       decoration: InputDecoration(

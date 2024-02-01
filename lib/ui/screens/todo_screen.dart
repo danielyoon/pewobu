@@ -1,12 +1,14 @@
-import 'package:flutter/scheduler.dart';
-import 'package:todo_list/controller/logic/todo_list_logic.dart';
+import 'package:intl/intl.dart';
+import 'package:todo_list/controller/models/task.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/core_packages.dart';
+import 'package:todo_list/controller/logic/base_todo_provider.dart';
 
 class TodoScreen extends StatefulWidget {
   final String title;
+  final BaseTodoProvider provider;
 
-  const TodoScreen({super.key, required this.title});
+  const TodoScreen({super.key, required this.title, required this.provider});
 
   @override
   State<TodoScreen> createState() => _TodoScreenState();
@@ -15,6 +17,8 @@ class TodoScreen extends StatefulWidget {
 class _TodoScreenState extends State<TodoScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _categoryController;
+  late final TextEditingController _taskController;
+  late final TextEditingController _dateController;
   bool addTask = false;
 
   @override
@@ -23,12 +27,16 @@ class _TodoScreenState extends State<TodoScreen> {
 
     _titleController = TextEditingController(text: '');
     _categoryController = TextEditingController(text: '');
+    _taskController = TextEditingController(text: '');
+    _dateController = TextEditingController(text: 'Today');
   }
 
   @override
   void dispose() {
     _titleController.dispose();
     _categoryController.dispose();
+    _taskController.dispose();
+    _dateController.dispose();
     super.dispose();
   }
 
@@ -38,149 +46,155 @@ class _TodoScreenState extends State<TodoScreen> {
     });
   }
 
+  // void _handleSubmit(String title) {
+  //   DateTime? parsedDate;
+  //   DateFormat format = DateFormat('MMM dd yy');
+  //   if (_dateController.text.isNotEmpty && _dateController.text != 'Today') {
+  //     parsedDate = format.parse(_dateController.text);
+  //   }
+  //
+  //   Task? dependentTask;
+  //   if (_taskController.text.isNotEmpty) {
+  //     for (Task task in list!.tasks) {
+  //       if (task.title == _taskController.text) {
+  //         dependentTask = task;
+  //       }
+  //     }
+  //   }
+  //
+  //   Task newTask = Task(
+  //     title: _titleController.text,
+  //     subcategory: _categoryController.text,
+  //     created: DateTime.now(),
+  //     due: parsedDate,
+  //     dependency: dependentTask,
+  //   );
+  //
+  //   todoLogic.updateTodoList(title, newTask);
+  //   _titleController.text = '';
+  //   _categoryController.text = '';
+  //   _taskController.text = '';
+  //   _dateController.text = 'Today';
+  //   _handleAddTask();
+  //   return;
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final todoLogic = Provider.of<TodoListLogic>(context, listen: true);
-    int uncompletedTasks = todoLogic.getUncompletedTasks(widget.title);
-    int completedTasks = todoLogic.getCompletedTasks(widget.title);
+    Icon getIconFromTitle() {
+      switch (widget.title) {
+        case 'Personal':
+          return Icon(Icons.person, color: kPersonal);
+        case 'Work':
+          return Icon(Icons.shopping_bag_rounded, color: kWork);
+        case 'Bucket':
+          return Icon(Icons.star, color: kBucket);
+        default:
+          return Icon(Icons.person, color: kPersonal);
+      }
+    }
 
-    // List<String> categories = todoLogic.getExistingCategories().toList();
-    List<String> categories = ['test', 'hello'];
+    // List<String> categories = todoLogic.getExistingCategories(widget.title).toList();
+    // List<String> titles = todoLogic.getExistingTasks(widget.title).toList();
 
+    //TODO: Fix PopScope here
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: addTask
-            ? IconButton(icon: Icon(Icons.close, color: kGrey), onPressed: () => _handleAddTask())
-            : BackButton(
-                color: kGrey,
-                onPressed: () => appRouter.pop(),
-              ),
-        title: addTask ? Text('New Task', style: kSubHeader.copyWith(fontSize: kSmall + 2, color: kGrey)) : Container(),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert_rounded, color: kGrey),
-            onPressed: () => print('Open sort list'),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       extendBodyBehindAppBar: true,
-      floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
-        backgroundColor: ColorUtils.getColorFromTitle(widget.title),
-        onPressed: () => _handleAddTask(),
-        child: Icon(Icons.add, color: kWhite),
-      ),
+      floatingActionButton: addTask
+          ? Container()
+          : FloatingActionButton(
+              shape: CircleBorder(),
+              backgroundColor: ColorUtils.getColorFromTitle(widget.title),
+              onPressed: () => _handleAddTask(),
+              child: Icon(Icons.add, color: kWhite),
+            ),
       body: AnimatedSwitcher(
         duration: Duration(seconds: 1),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Gap(kToolbarHeight + kSmall * 2),
-            addTask
-                ? Padding(
-                    padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Gap(kToolbarHeight + kSmall * 2),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(kExtraExtraSmall),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: kGrey.withOpacity(.4)),
+                      ),
+                      child: getIconFromTitle(),
+                    ),
+                    Gap(kMedium),
+                    Text('${widget.provider.getNumberOfUncompletedTasks()} Tasks',
+                        style: kSubHeader.copyWith(color: kGrey)),
+                    Text(widget.title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+                    Gap(kMedium),
+                    Row(
                       children: [
-                        Text('What tasks are you planning to perform?', style: kBodyText.copyWith(color: kGrey)),
-                        CustomTextField(
-                          controller: _titleController,
+                        Expanded(
+                          child: CustomProgressBar(
+                              completionPercentage: widget.provider.getRoundedPercentageOfCompletedTasks(),
+                              color: ColorUtils.getColorFromTitle(widget.title)),
                         ),
-                        Text('What category does it fall under?', style: kBodyText.copyWith(color: kGrey)),
-                        Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                            if (textEditingValue.text == '') {
-                              return const Iterable<String>.empty();
-                            }
-                            return categories.where((String option) {
-                              return option.contains(textEditingValue.text.toLowerCase());
-                            });
-                          },
-                          optionsViewBuilder: (
-                            BuildContext context,
-                            AutocompleteOnSelected<String> onSelected,
-                            Iterable<String> options,
-                          ) {
-                            const AutocompleteOptionToString<String> displayStringForOption =
-                                RawAutocomplete.defaultStringForOption;
-                            return Align(
-                              alignment: Alignment.topLeft,
-                              child: Material(
-                                elevation: 4.0,
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxHeight: 200, maxWidth: 300),
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    itemCount: options.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final String option = options.elementAt(index);
-                                      return InkWell(
-                                        onTap: () {
-                                          onSelected(option);
-                                        },
-                                        child: Builder(builder: (BuildContext context) {
-                                          final bool highlight = AutocompleteHighlightedOption.of(context) == index;
-                                          if (highlight) {
-                                            SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-                                              Scrollable.ensureVisible(context, alignment: 0.5);
-                                            });
-                                          }
-                                          return Container(
-                                            color: highlight ? Theme.of(context).focusColor : null,
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Text(displayStringForOption(option)),
-                                          );
-                                        }),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          onSelected: (String selection) {
-                            _categoryController.text = selection;
-                          },
-                          fieldViewBuilder: (
-                            BuildContext context,
-                            TextEditingController fieldTextEditingController,
-                            FocusNode fieldFocusNode,
-                            VoidCallback onFieldSubmitted,
-                          ) {
-                            return TextField(
-                              cursorColor: kGrey,
-                              style: kBodyText,
-                              controller: fieldTextEditingController,
-                              focusNode: fieldFocusNode,
-                              onSubmitted: (String value) {
-                                onFieldSubmitted();
-                              },
-                              onChanged: (e) => print('TEST'),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                              ),
-                            );
-                          },
-                        ),
-                        Text('Does it depend on anything else?', style: kBodyText.copyWith(color: kGrey)),
-                        //TODO: Add autocomplete here
-                        Gap(kExtraLarge),
-                        Text('Does it have a due date?', style: kBodyText.copyWith(color: kGrey))
+                        Gap(kExtraExtraSmall),
+                        Text('${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
                       ],
                     ),
-                  )
-                : TodoList(
-                    uncompletedTasks: uncompletedTasks,
-                    title: widget.title,
-                    completedTasks: completedTasks,
-                    key: ValueKey(false)),
-          ],
+                    Gap(kSmall),
+                    ListView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: widget.provider.tasks.length,
+                      itemBuilder: (context, index) {
+                        if (index < widget.provider.subcategory.length) {
+                          String category = widget.provider.subcategory.elementAt(index);
+                          List<Task> tasks =
+                              widget.provider.getSubcategory(widget.provider.subcategory.elementAt(index));
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(category, style: kBodyText),
+                              ListView.builder(
+                                padding: EdgeInsets.zero,
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: tasks.length,
+                                itemBuilder: (context, taskIndex) {
+                                  Task task = tasks[taskIndex];
+                                  return Text(task.title);
+                                },
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              addTask
+                  ? GestureDetector(
+                      onTap: () => print('TEST'),
+                      child: Container(
+                        padding: EdgeInsets.zero,
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: ColorUtils.getColorFromTitle(widget.title)),
+                        child: Icon(Icons.add, color: kWhite),
+                      ),
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );
@@ -190,16 +204,70 @@ class _TodoScreenState extends State<TodoScreen> {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: BackButton(
-        color: kGrey,
-        onPressed: () => appRouter.pop(),
-      ),
+      leading: addTask
+          ? IconButton(icon: Icon(Icons.close, color: kGrey), onPressed: () => _handleAddTask())
+          : BackButton(
+              color: kGrey,
+              onPressed: () => Navigator.pop(context, true),
+            ),
+      title: addTask ? Text('New Task', style: kSubHeader.copyWith(fontSize: kSmall + 2, color: kGrey)) : Container(),
+      centerTitle: true,
       actions: [
         IconButton(
           icon: Icon(Icons.more_vert_rounded, color: kGrey),
           onPressed: () => print('Open sort list'),
         ),
       ],
+    );
+  }
+}
+
+class AddTaskForm extends StatelessWidget {
+  const AddTaskForm({
+    super.key,
+    required TextEditingController titleController,
+    required this.categories,
+    required TextEditingController categoryController,
+    required this.titles,
+    required TextEditingController taskController,
+    required TextEditingController dateController,
+  })  : _titleController = titleController,
+        _categoryController = categoryController,
+        _taskController = taskController,
+        _dateController = dateController;
+
+  final TextEditingController _titleController;
+  final List<String> categories;
+  final TextEditingController _categoryController;
+  final List<String> titles;
+  final TextEditingController _taskController;
+  final TextEditingController _dateController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
+        child: Form(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('What task are you planning to perform?', style: kBodyText.copyWith(color: kGrey)),
+              CustomTextField(
+                controller: _titleController,
+              ),
+              Text('What category does it fall under?', style: kBodyText.copyWith(color: kGrey)),
+              CustomAutocomplete(categories: categories, controller: _categoryController),
+              Text('Does it depend on anything else?', style: kBodyText.copyWith(color: kGrey)),
+              CustomAutocomplete(categories: titles, controller: _taskController),
+              Text('Does it have a due date?', style: kBodyText.copyWith(color: kGrey)),
+              Gap(kSmall),
+              CustomCalendar(controller: _dateController),
+              Spacer(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -233,34 +301,39 @@ class TodoList extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(kExtraExtraSmall),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: kGrey.withOpacity(.4)),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(kExtraExtraSmall),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: kGrey.withOpacity(.4)),
+              ),
+              child: getIconFromTitle(),
             ),
-            child: getIconFromTitle(),
-          ),
-          Gap(kMedium),
-          Text('$uncompletedTasks Tasks', style: kSubHeader.copyWith(color: kGrey)),
-          Text(title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
-          Gap(kMedium),
-          Row(
-            children: [
-              Expanded(
-                child: CustomProgressBar(
-                    completionPercentage: ((1 / 17) * 100).round(), color: ColorUtils.getColorFromTitle(title)),
-              ),
-              Gap(kExtraExtraSmall),
-              Text(
-                '${(uncompletedTasks + completedTasks) == 0 ? 0 : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round()}%',
-              ),
-            ],
-          ),
-        ],
+            Gap(kMedium),
+            Text('$uncompletedTasks Tasks', style: kSubHeader.copyWith(color: kGrey)),
+            Text(title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+            Gap(kMedium),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomProgressBar(
+                      completionPercentage: (uncompletedTasks + completedTasks) == 0
+                          ? 0
+                          : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round(),
+                      color: ColorUtils.getColorFromTitle(title)),
+                ),
+                Gap(kExtraExtraSmall),
+                Text(
+                  '${(uncompletedTasks + completedTasks) == 0 ? 0 : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round()}%',
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

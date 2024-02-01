@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:todo_list/controller/logic/todo_list_logic.dart';
-import 'package:todo_list/controller/models/todo_data.dart';
+import 'package:todo_list/controller/logic/bucket_logic.dart';
+import 'package:todo_list/controller/logic/personal_logic.dart';
+import 'package:todo_list/controller/logic/work_logic.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
-import 'package:todo_list/controller/utils/string_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
@@ -74,26 +74,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _backgroundColor.value = ColorUtils.getColorFromIndex(index);
   }
 
-  void _handleOnTap(int index) {
-    if (currentIndex == index) appRouter.push('/task/${StringUtils.getTitleFromIndex(index)}');
-    _carouselController.animateToPage(index);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final todoLogic = Provider.of<TodoListLogic>(context, listen: true);
-    TodoData personal = todoLogic.personalList;
-    TodoData work = todoLogic.workList;
-    TodoData bucket = todoLogic.bucketList;
-
-    int numberOfTasks = todoLogic.getDueTodayTasks();
+    final personal = context.watch<PersonalLogic>();
+    final work = context.watch<WorkLogic>();
+    final bucket = context.watch<BucketLogic>();
 
     double availableHeight =
         MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - 315;
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: _buildAppBar(),
+      appBar: _buildHomeAppBar(),
+      drawer: Drawer(),
       extendBodyBehindAppBar: true,
       body: AnimatedBuilder(
         animation: _animation,
@@ -104,8 +97,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Gap(kToolbarHeight + kSmall),
-                _buildWelcomeMessage(numberOfTasks),
-                _buildCarouselList(personal, work, bucket, availableHeight),
+                IntroWidget(
+                    timeOfDay: timeOfDay, personal: personal, work: work, bucket: bucket, dateOfToday: dateOfToday),
+                Expanded(
+                  child: CarouselSlider(
+                    carouselController: _carouselController,
+                    items: [
+                      CustomListCard(provider: personal, title: 'Personal'),
+                      CustomListCard(provider: work, title: 'Work'),
+                      CustomListCard(provider: bucket, title: 'Bucket'),
+                    ],
+                    options: CarouselOptions(
+                      height: availableHeight,
+                      enableInfiniteScroll: false,
+                      enlargeCenterPage: true,
+                      onPageChanged: (index, reason) {
+                        currentIndex = index;
+                        _backgroundColor.value = ColorUtils.getColorFromIndex(index);
+                      },
+                    ),
+                  ),
+                ),
                 Gap(kLarge),
               ],
             ),
@@ -115,8 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  //TODO: Build side drawer change image/name, toggle dark mode
-  AppBar _buildAppBar() {
+  AppBar _buildHomeAppBar() {
     return AppBar(
       title: Text('TODO', style: kSubHeader.copyWith(fontSize: kSmall + 2)),
       centerTitle: true,
@@ -124,12 +135,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       elevation: 0,
       leading: IconButton(
         icon: Icon(Icons.menu_rounded, color: kWhite),
-        onPressed: () => print('Open Drawer!'),
+        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
       ),
     );
   }
+}
 
-  Padding _buildWelcomeMessage(int numberOfTasks) {
+class IntroWidget extends StatelessWidget {
+  const IntroWidget({
+    super.key,
+    required this.timeOfDay,
+    required this.personal,
+    required this.work,
+    required this.bucket,
+    required this.dateOfToday,
+  });
+
+  final String timeOfDay;
+  final PersonalLogic personal;
+  final WorkLogic work;
+  final BucketLogic bucket;
+  final String dateOfToday;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: kLarge + 4),
       child: Column(
@@ -141,34 +170,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Text('Hello, Daniel.', style: kHeader),
           Gap(kExtraExtraSmall),
           Text('Good $timeOfDay!', style: kSubHeader),
-          Text('You have $numberOfTasks tasks due today.', style: kSubHeader),
+          Text(
+              'You have ${personal.getTasksDueToday().length + work.getTasksDueToday().length + bucket.getTasksDueToday().length} tasks due today.',
+              style: kSubHeader),
           Gap(kLarge),
-          Text('Today: $dateOfToday', style: kSubHeader.copyWith(fontWeight: FontWeight.w900, fontSize: kSmall)),
+          Text('TODAY: $dateOfToday', style: kSubHeader.copyWith(fontWeight: FontWeight.w900, fontSize: kSmall)),
           Gap(kSmall),
         ],
-      ),
-    );
-  }
-
-  //TODO: Add transition effect to next page // Try animatedContainer? Hero widget?
-  Expanded _buildCarouselList(TodoData personal, TodoData work, TodoData bucket, double availableHeight) {
-    return Expanded(
-      child: CarouselSlider(
-        carouselController: _carouselController,
-        items: [
-          CustomListCard(data: personal, index: 0, onTap: () => _handleOnTap(0)),
-          CustomListCard(data: work, index: 1, onTap: () => _handleOnTap(1)),
-          CustomListCard(data: bucket, index: 2, onTap: () => _handleOnTap(2)),
-        ],
-        options: CarouselOptions(
-          height: availableHeight,
-          enableInfiniteScroll: false,
-          enlargeCenterPage: true,
-          onPageChanged: (index, reason) {
-            currentIndex = index;
-            _backgroundColor.value = ColorUtils.getColorFromIndex(index);
-          },
-        ),
       ),
     );
   }

@@ -14,6 +14,11 @@ class Task {
       this.completed,
       this.dependency});
 
+  void toggleTask() {
+    isCompleted = !isCompleted;
+    completed = isCompleted ? DateTime.now() : null;
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'title': title,
