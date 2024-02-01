@@ -97,103 +97,111 @@ class _TodoScreenState extends State<TodoScreen> {
     // List<String> categories = todoLogic.getExistingCategories(widget.title).toList();
     // List<String> titles = todoLogic.getExistingTasks(widget.title).toList();
 
-    //TODO: Fix PopScope here
-    return Scaffold(
-      appBar: _buildAppBar(),
-      extendBodyBehindAppBar: true,
-      floatingActionButton: addTask
-          ? Container()
-          : FloatingActionButton(
-              shape: CircleBorder(),
-              backgroundColor: ColorUtils.getColorFromTitle(widget.title),
-              onPressed: () => _handleAddTask(),
-              child: Icon(Icons.add, color: kWhite),
-            ),
-      body: AnimatedSwitcher(
-        duration: Duration(seconds: 1),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Gap(kToolbarHeight + kSmall * 2),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(kExtraExtraSmall),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: kGrey.withOpacity(.4)),
-                      ),
-                      child: getIconFromTitle(),
-                    ),
-                    Gap(kMedium),
-                    Text('${widget.provider.getNumberOfUncompletedTasks()} Tasks',
-                        style: kSubHeader.copyWith(color: kGrey)),
-                    Text(widget.title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
-                    Gap(kMedium),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomProgressBar(
-                              completionPercentage: widget.provider.getRoundedPercentageOfCompletedTasks(),
-                              color: ColorUtils.getColorFromTitle(widget.title)),
-                        ),
-                        Gap(kExtraExtraSmall),
-                        Text('${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
-                      ],
-                    ),
-                    Gap(kSmall),
-                    ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: widget.provider.tasks.length,
-                      itemBuilder: (context, index) {
-                        if (index < widget.provider.subcategory.length) {
-                          String category = widget.provider.subcategory.elementAt(index);
-                          List<Task> tasks =
-                              widget.provider.getSubcategory(widget.provider.subcategory.elementAt(index));
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(category, style: kBodyText),
-                              ListView.builder(
-                                padding: EdgeInsets.zero,
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: tasks.length,
-                                itemBuilder: (context, taskIndex) {
-                                  Task task = tasks[taskIndex];
-                                  return Text(task.title);
-                                },
-                              ),
-                            ],
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+    return PopScope(
+      canPop: addTask ? false : true,
+      onPopInvoked: (canPop) {
+        if (addTask) {
+          _handleAddTask();
+        }
+        () => Navigator.pop(context, true);
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        extendBodyBehindAppBar: true,
+        floatingActionButton: addTask
+            ? Container()
+            : FloatingActionButton(
+                shape: CircleBorder(),
+                backgroundColor: ColorUtils.getColorFromTitle(widget.title),
+                onPressed: () => _handleAddTask(),
+                child: Icon(Icons.add, color: kWhite),
               ),
-              addTask
-                  ? GestureDetector(
-                      onTap: () => print('TEST'),
-                      child: Container(
-                        padding: EdgeInsets.zero,
-                        height: 50,
-                        width: double.infinity,
-                        decoration: BoxDecoration(color: ColorUtils.getColorFromTitle(widget.title)),
-                        child: Icon(Icons.add, color: kWhite),
+        body: AnimatedSwitcher(
+          duration: Duration(seconds: 1),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Gap(kToolbarHeight + kSmall * 2),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(kExtraExtraSmall),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: kGrey.withOpacity(.4)),
+                        ),
+                        child: getIconFromTitle(),
                       ),
-                    )
-                  : Container(),
-            ],
+                      Gap(kMedium),
+                      Text('${widget.provider.getNumberOfUncompletedTasks()} Tasks',
+                          style: kSubHeader.copyWith(color: kGrey)),
+                      Text(widget.title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+                      Gap(kMedium),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomProgressBar(
+                                completionPercentage: widget.provider.getRoundedPercentageOfCompletedTasks(),
+                                color: ColorUtils.getColorFromTitle(widget.title)),
+                          ),
+                          Gap(kExtraExtraSmall),
+                          Text('${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
+                        ],
+                      ),
+                      Gap(kSmall),
+                      ListView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: widget.provider.tasks.length,
+                        itemBuilder: (context, index) {
+                          if (index < widget.provider.subcategory.length) {
+                            String category = widget.provider.subcategory.elementAt(index);
+                            List<Task> tasks =
+                                widget.provider.getSubcategory(widget.provider.subcategory.elementAt(index));
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(category, style: kBodyText),
+                                ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: tasks.length,
+                                  itemBuilder: (context, taskIndex) {
+                                    Task task = tasks[taskIndex];
+                                    return Text(task.title);
+                                  },
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                addTask
+                    ? GestureDetector(
+                        onTap: () => print('TEST'),
+                        child: Container(
+                          padding: EdgeInsets.zero,
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(color: ColorUtils.getColorFromTitle(widget.title)),
+                          child: Icon(Icons.add, color: kWhite),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
           ),
         ),
       ),
