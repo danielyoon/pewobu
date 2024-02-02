@@ -7,7 +7,10 @@ class TodoScreen extends StatefulWidget {
   final String title;
   final BaseTodoProvider provider;
 
-  const TodoScreen({super.key, required this.title, required this.provider});
+  const TodoScreen(
+      {super.key,
+      required this.title,
+      required this.provider});
 
   @override
   State<TodoScreen> createState() => _TodoScreenState();
@@ -25,7 +28,8 @@ class _TodoScreenState extends State<TodoScreen> {
         case 'Personal':
           return Icon(Icons.person, color: kPersonal);
         case 'Work':
-          return Icon(Icons.shopping_bag_rounded, color: kWork);
+          return Icon(Icons.shopping_bag_rounded,
+              color: kWork);
         case 'Bucket':
           return Icon(Icons.star, color: kBucket);
         default:
@@ -39,7 +43,8 @@ class _TodoScreenState extends State<TodoScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: '${widget.title}-button',
         shape: CircleBorder(),
-        backgroundColor: ColorUtils.getColorFromTitle(widget.title),
+        backgroundColor:
+            ColorUtils.getColorFromTitle(widget.title),
         onPressed: () => _navigateToAdd(widget.provider),
         child: Icon(Icons.add, color: kWhite),
       ),
@@ -49,33 +54,47 @@ class _TodoScreenState extends State<TodoScreen> {
           children: [
             Gap(kToolbarHeight + kSmall * 2),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
+              padding: EdgeInsets.symmetric(
+                  horizontal: kLarge + kSmall),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(kExtraExtraSmall),
+                    padding:
+                        EdgeInsets.all(kExtraExtraSmall),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: kGrey.withOpacity(.4)),
+                      border: Border.all(
+                          color: kGrey.withOpacity(.4)),
                     ),
                     child: getIconFromTitle(),
                   ),
                   Gap(kMedium),
-                  Text('${widget.provider.getNumberOfUncompletedTasks()} Tasks',
-                      style: kSubHeader.copyWith(color: kGrey)),
-                  Text(widget.title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+                  Text(
+                      '${widget.provider.getNumberOfUncompletedTasks()} Tasks',
+                      style: kSubHeader.copyWith(
+                          color: kGrey)),
+                  Text(widget.title,
+                      style: kHeader.copyWith(
+                          color:
+                              kTextColor.withOpacity(.6))),
                   Gap(kMedium),
                   Row(
                     children: [
                       Expanded(
                         child: CustomProgressBar(
-                            completionPercentage: widget.provider.getRoundedPercentageOfCompletedTasks(),
-                            color: ColorUtils.getColorFromTitle(widget.title)),
+                            completionPercentage: widget
+                                .provider
+                                .getRoundedPercentageOfCompletedTasks(),
+                            color: ColorUtils
+                                .getColorFromTitle(
+                                    widget.title)),
                       ),
                       Gap(kExtraExtraSmall),
-                      Text('${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
+                      Text(
+                          '${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
                     ],
                   ),
                   Gap(kSmall),
@@ -85,20 +104,33 @@ class _TodoScreenState extends State<TodoScreen> {
                     shrinkWrap: true,
                     itemCount: widget.provider.tasks.length,
                     itemBuilder: (context, index) {
-                      if (index < widget.provider.subcategory.length) {
-                        String category = widget.provider.subcategory.elementAt(index);
-                        List<Task> tasks = widget.provider.getSubcategory(widget.provider.subcategory.elementAt(index));
+                      if (index <
+                          widget.provider.subcategory
+                              .length) {
+                        String category = widget
+                            .provider.subcategory
+                            .elementAt(index);
+                        List<Task> tasks = widget.provider
+                            .getSubcategory(widget
+                                .provider.subcategory
+                                .elementAt(index));
+                        //TODO: Work on this portion!
                         return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
-                            Text(category.toUpperCase(), style: kBodyText),
+                            Text(category.toUpperCase(),
+                                style: kBodyText),
                             ListView.builder(
                               padding: EdgeInsets.zero,
-                              physics: NeverScrollableScrollPhysics(),
+                              physics:
+                                  NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: tasks.length,
-                              itemBuilder: (context, taskIndex) {
-                                Task task = tasks[taskIndex];
+                              itemBuilder:
+                                  (context, taskIndex) {
+                                Task task =
+                                    tasks[taskIndex];
                                 return Text(task.title);
                               },
                             ),
@@ -156,7 +188,8 @@ class TodoList extends StatelessWidget {
         case 'Personal':
           return Icon(Icons.person, color: kPersonal);
         case 'Work':
-          return Icon(Icons.shopping_bag_rounded, color: kWork);
+          return Icon(Icons.shopping_bag_rounded,
+              color: kWork);
         case 'Bucket':
           return Icon(Icons.star, color: kBucket);
         default:
@@ -165,7 +198,8 @@ class TodoList extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: kLarge + kSmall),
+      padding:
+          EdgeInsets.symmetric(horizontal: kLarge + kSmall),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,22 +208,33 @@ class TodoList extends StatelessWidget {
               padding: EdgeInsets.all(kExtraExtraSmall),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: kGrey.withOpacity(.4)),
+                border: Border.all(
+                    color: kGrey.withOpacity(.4)),
               ),
               child: getIconFromTitle(),
             ),
             Gap(kMedium),
-            Text('$uncompletedTasks Tasks', style: kSubHeader.copyWith(color: kGrey)),
-            Text(title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+            Text('$uncompletedTasks Tasks',
+                style: kSubHeader.copyWith(color: kGrey)),
+            Text(title,
+                style: kHeader.copyWith(
+                    color: kTextColor.withOpacity(.6))),
             Gap(kMedium),
             Row(
               children: [
                 Expanded(
                   child: CustomProgressBar(
-                      completionPercentage: (uncompletedTasks + completedTasks) == 0
+                      completionPercentage: (uncompletedTasks +
+                                  completedTasks) ==
+                              0
                           ? 0
-                          : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round(),
-                      color: ColorUtils.getColorFromTitle(title)),
+                          : ((uncompletedTasks /
+                                      (uncompletedTasks +
+                                          completedTasks)) *
+                                  100)
+                              .round(),
+                      color: ColorUtils.getColorFromTitle(
+                          title)),
                 ),
                 Gap(kExtraExtraSmall),
                 Text(
