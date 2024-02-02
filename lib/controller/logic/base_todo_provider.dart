@@ -22,9 +22,16 @@ class BaseTodoProvider extends ChangeNotifier {
     }
   }
 
+  void addDependency(String title, Task task) {
+    Task currentTask = tasks.firstWhere((task) => task.title == title);
+    currentTask.addDependency(task);
+    notifyListeners();
+  }
+
   void removeTask(Task task) {
     tasks.remove(task);
-    if (!tasks.any((t) => t.subcategory == task.subcategory)) subcategory.remove(task.subcategory);
+    if (!tasks.any((t) => t.subcategory == task.subcategory))
+      subcategory.remove(task.subcategory);
     notifyListeners();
   }
 
@@ -39,7 +46,12 @@ class BaseTodoProvider extends ChangeNotifier {
   List<Task> getTasksDueToday() {
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
-    return tasks.where((task) => task.due != null && !task.isCompleted && task.due!.isAtSameMomentAs(today)).toList();
+    return tasks
+        .where((task) =>
+            task.due != null &&
+            !task.isCompleted &&
+            task.due!.isAtSameMomentAs(today))
+        .toList();
   }
 
   int getRoundedPercentageOfCompletedTasks() {

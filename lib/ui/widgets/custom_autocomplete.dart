@@ -5,8 +5,7 @@ class CustomAutocomplete extends StatelessWidget {
   final List<String> categories;
   final TextEditingController controller;
 
-  const CustomAutocomplete(
-      {super.key, required this.categories, required this.controller});
+  const CustomAutocomplete({super.key, required this.categories, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +16,8 @@ class CustomAutocomplete extends StatelessWidget {
         if (textEditingValue.text == '') {
           return Iterable<String>.empty();
         }
-        return categories.where(
-            (option) => option.contains(textEditingValue.text.toLowerCase()));
+        final inputTextLower = textEditingValue.text.toLowerCase();
+        return categories.where((option) => option.contains(inputTextLower));
       },
       onSelected: (selection) {
         controller.text = selection;
@@ -36,6 +35,7 @@ class CustomAutocomplete extends StatelessWidget {
           focusNode: fieldFocusNode,
           onSubmitted: (String value) {
             onFieldSubmitted();
+            controller.text = value;
           },
           onChanged: (e) => controller.text = e,
           decoration: InputDecoration(
@@ -51,8 +51,7 @@ class CustomAutocomplete extends StatelessWidget {
           child: Material(
             elevation: kExtraExtraSmall,
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight: 200, maxWidth: width > 500 ? width / 2.5 : width),
+              constraints: BoxConstraints(maxHeight: 200, maxWidth: width > 500 ? width / 2.5 : width),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
@@ -63,22 +62,20 @@ class CustomAutocomplete extends StatelessWidget {
                     onTap: () {
                       onSelected(option);
                     },
-                    child: Builder(builder: (BuildContext context) {
-                      final bool highlight =
-                          AutocompleteHighlightedOption.of(context) == index;
-                      if (highlight) {
-                        SchedulerBinding.instance
-                            .addPostFrameCallback((Duration timeStamp) {
-                          Scrollable.ensureVisible(context, alignment: 0.5);
-                        });
-                      }
-                      return Container(
-                        padding: EdgeInsets.all(kSmall),
-                        child: Text(
-                            RawAutocomplete.defaultStringForOption(option),
-                            style: kBodyText),
-                      );
-                    }),
+                    child: Builder(
+                      builder: (BuildContext context) {
+                        final bool highlight = AutocompleteHighlightedOption.of(context) == index;
+                        if (highlight) {
+                          SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
+                            Scrollable.ensureVisible(context, alignment: 0.5);
+                          });
+                        }
+                        return Container(
+                          padding: EdgeInsets.all(kSmall),
+                          child: Text(RawAutocomplete.defaultStringForOption(option), style: kBodyText),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
