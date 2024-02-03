@@ -6,6 +6,13 @@ import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
+/*
+* TODO: Make responsive for web sizes -- add LayoutBuilder
+* TODO: Add change image on Drawer
+* TODO: Add change name on Drawer -- Maybe add first-time name screen?
+* TODO: Add dark mode toggle on Drawer
+* */
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -97,32 +104,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Gap(kToolbarHeight + kSmall),
-                IntroWidget(
+                _IntroWidget(
                     timeOfDay: timeOfDay, personal: personal, work: work, bucket: bucket, dateOfToday: dateOfToday),
-                Expanded(
-                  child: CarouselSlider(
-                    carouselController: _carouselController,
-                    items: [
-                      CustomListCard(provider: personal, title: 'Personal'),
-                      CustomListCard(provider: work, title: 'Work'),
-                      CustomListCard(provider: bucket, title: 'Bucket'),
-                    ],
-                    options: CarouselOptions(
-                      height: availableHeight,
-                      enableInfiniteScroll: false,
-                      enlargeCenterPage: true,
-                      onPageChanged: (index, reason) {
-                        currentIndex = index;
-                        _backgroundColor.value = ColorUtils.getColorFromIndex(index);
-                      },
-                    ),
-                  ),
-                ),
+                _buildCarousel(personal, work, bucket, availableHeight),
                 Gap(kLarge),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Expanded _buildCarousel(PersonalLogic personal, WorkLogic work, BucketLogic bucket, double availableHeight) {
+    return Expanded(
+      child: CarouselSlider(
+        carouselController: _carouselController,
+        items: [
+          CustomListCard(provider: personal, title: 'Personal'),
+          CustomListCard(provider: work, title: 'Work'),
+          CustomListCard(provider: bucket, title: 'Bucket'),
+        ],
+        options: CarouselOptions(
+          height: availableHeight,
+          enableInfiniteScroll: false,
+          onPageChanged: (index, reason) {
+            currentIndex = index;
+            _backgroundColor.value = ColorUtils.getColorFromIndex(index);
+          },
+        ),
       ),
     );
   }
@@ -141,9 +151,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 }
 
-class IntroWidget extends StatelessWidget {
-  const IntroWidget({
-    super.key,
+class _IntroWidget extends StatelessWidget {
+  const _IntroWidget({
     required this.timeOfDay,
     required this.personal,
     required this.work,

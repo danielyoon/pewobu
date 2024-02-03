@@ -4,6 +4,16 @@ import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/models/task.dart';
 
+/*
+* TODO: Make this more responsive for shorter screens
+* TODO: Make it 2 columns (on larger screens) where the second column shows the Task created
+* TODO: Add verification of adding a new Task
+* TODO: Search existing tasks to prevent same title task
+* TODO: Setup a prettier error text
+* TODO: Autocomplete should be fixed to handle both uppercase and lowercase letters
+* TODO: Better design for some fields?
+* */
+
 class AddTaskScreen extends StatefulWidget {
   final BaseTodoProvider provider;
   final String title;
@@ -20,6 +30,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   late final TextEditingController _taskController;
   late final TextEditingController _dateController;
 
+  bool showErrorText = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +39,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _titleController = TextEditingController(text: '');
     _categoryController = TextEditingController(text: '');
     _taskController = TextEditingController(text: '');
-    _dateController = TextEditingController(text: 'None');
+    _dateController = TextEditingController(text: 'No');
   }
 
   @override
@@ -39,36 +51,40 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     super.dispose();
   }
 
-  //TODO: Setup form handling
   void _handleSubmit(BaseTodoProvider provider, BuildContext context) {
-    DateTime? parsedDate;
-    DateFormat format = DateFormat('MMM dd yy');
-    if (_dateController.text.isNotEmpty && _dateController.text != 'None') {
-      parsedDate = format.parse(_dateController.text);
-    }
+    showErrorText = false;
+    if (_titleController.text.isNotEmpty) {
+      DateTime? parsedDate;
+      DateFormat format = DateFormat('MMM dd yy');
+      if (_dateController.text.isNotEmpty && _dateController.text != 'No') {
+        parsedDate = format.parse(_dateController.text);
+      }
 
-    Task? dependentTask;
-    if (_taskController.text.isNotEmpty) {
-      for (Task task in provider.tasks) {
-        if (task.title == _taskController.text) {
-          dependentTask = task;
+      Task? dependentTask;
+      if (_taskController.text.isNotEmpty) {
+        for (Task task in provider.tasks) {
+          if (task.title == _taskController.text) {
+            dependentTask = task;
+          }
         }
       }
+
+      Task newTask = Task(
+        title: _titleController.text,
+        subcategory: _categoryController.text,
+        created: DateTime.now(),
+        dependencies: [],
+        due: parsedDate,
+        hasDependency: dependentTask != null ? true : false,
+      );
+
+      if (dependentTask != null) dependentTask.addDependency(newTask);
+      provider.addTask(newTask);
+      Navigator.pop(context);
     }
-
-    Task newTask = Task(
-      title: _titleController.text,
-      subcategory: _categoryController.text,
-      created: DateTime.now(),
-      dependencies: [],
-      due: parsedDate,
-      hasDependency: dependentTask != null ? true : false,
-    );
-
-    if (dependentTask != null) dependentTask.addDependency(newTask);
-    provider.addTask(newTask);
-
-    Navigator.pop(context);
+    setState(() {
+      showErrorText = true;
+    });
   }
 
   @override
@@ -76,7 +92,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     List<String> categories = widget.provider.subcategory.toList();
     List<String> titles = widget.provider.tasks.map((task) => task.title).toList();
 
-//TODO: Add error message somewhere
     return Scaffold(
       appBar: _buildAppBar(),
       extendBodyBehindAppBar: true,
@@ -92,8 +107,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 children: [
                   Text('What task are you planning to perform?', style: kBodyText.copyWith(color: kGrey)),
                   CustomTextField(
-                    controller: _titleController,
-                  ),
+                      controller: _titleController,
+                      onChanged: (_) => setState(() {
+                            showErrorText = false;
+                          })),
+                  if (showErrorText) ...[
+                    Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: kExtraSmall, vertical: kExtraExtraSmall),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: kError), borderRadius: BorderRadius.circular(kExtraExtraSmall)),
+                        child: Text('Please enter a title!', style: kBodyText.copyWith(color: kError))),
+                    Gap(kExtraSmall),
+                  ],
                   Text('What category does it fall under?', style: kBodyText.copyWith(color: kGrey)),
                   CustomAutocomplete(categories: categories, controller: _categoryController),
                   Text('Does it depend on anything else?', style: kBodyText.copyWith(color: kGrey)),
@@ -118,7 +144,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         icon: Icon(Icons.close, color: kGrey),
         onPressed: () => appRouter.pop(),
       ),
-      title: Text('New Task', style: kSubHeader.copyWith(color: kTextColor.withOpacity(.6))),
+      title: Text('New Task', style: kSubHeader.copyWith(color: kTextColor.withOpacity(.6), fontSize: kSmall)),
+      centerTitle: true,
     );
   }
 

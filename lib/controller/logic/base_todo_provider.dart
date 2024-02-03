@@ -4,10 +4,13 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/controller/models/task.dart';
 import 'package:todo_list/core_packages.dart';
+import 'package:todo_list/controller/utils/debouncer.dart';
 
 class BaseTodoProvider extends ChangeNotifier {
   List<Task> tasks = [];
   SplayTreeSet<String> subcategory = SplayTreeSet();
+
+  final Debouncer _debouncer = Debouncer(delay: Duration(milliseconds: 500));
 
   void addTask(Task task) {
     tasks.add(task);
@@ -30,8 +33,7 @@ class BaseTodoProvider extends ChangeNotifier {
 
   void removeTask(Task task) {
     tasks.remove(task);
-    if (!tasks.any((t) => t.subcategory == task.subcategory))
-      subcategory.remove(task.subcategory);
+    if (!tasks.any((t) => t.subcategory == task.subcategory)) subcategory.remove(task.subcategory);
     notifyListeners();
   }
 
@@ -46,12 +48,7 @@ class BaseTodoProvider extends ChangeNotifier {
   List<Task> getTasksDueToday() {
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
-    return tasks
-        .where((task) =>
-            task.due != null &&
-            !task.isCompleted &&
-            task.due!.isAtSameMomentAs(today))
-        .toList();
+    return tasks.where((task) => task.due != null && !task.isCompleted && task.due!.isAtSameMomentAs(today)).toList();
   }
 
   int getRoundedPercentageOfCompletedTasks() {
@@ -67,7 +64,7 @@ class BaseTodoProvider extends ChangeNotifier {
       'subcategory': subcategory.toList(),
       'tasks': tasks.map((task) => task.toJson()).toList(),
     });
-    await prefs.setString(category, data);
+    _debouncer.run(() async => await prefs.setString(category, data));
   }
 
   Future<void> loadData(String category) async {
