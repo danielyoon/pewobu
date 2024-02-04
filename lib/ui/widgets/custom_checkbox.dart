@@ -5,8 +5,9 @@ import 'package:todo_list/controller/models/task.dart';
 class CustomCheckbox extends StatefulWidget {
   final BaseTodoProvider provider;
   final Task task;
+  final bool isEnabled;
 
-  const CustomCheckbox({super.key, required this.task, required this.provider});
+  const CustomCheckbox({super.key, required this.task, required this.provider, this.isEnabled = true});
 
   @override
   State<CustomCheckbox> createState() => _CustomCheckboxState();
@@ -15,19 +16,23 @@ class CustomCheckbox extends StatefulWidget {
 class _CustomCheckboxState extends State<CustomCheckbox> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(widget.task.title),
-      leading: SizedBox(
-        height: kMedium,
-        width: kMedium,
-        child: Checkbox(
-          value: widget.task.isCompleted,
-          onChanged: (bool? value) {
-            setState(() {
-              widget.provider.toggleTask(widget.task);
-            });
-          },
+    return SizedBox(
+      height: kLarge,
+      child: ListTile(
+        enabled: widget.isEnabled,
+        contentPadding: EdgeInsets.zero,
+        title: Text(widget.task.title),
+        leading: SizedBox(
+          height: kMedium,
+          width: kMedium,
+          child: Checkbox(
+            value: widget.task.isCompleted,
+            onChanged: (bool? value) {
+              setState(() {
+                widget.provider.toggleTask(widget.task);
+              });
+            },
+          ),
         ),
       ),
     );

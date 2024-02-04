@@ -17,7 +17,7 @@ class CustomAutocomplete extends StatelessWidget {
           return Iterable<String>.empty();
         }
         final inputTextLower = textEditingValue.text.toLowerCase();
-        return categories.where((option) => option.contains(inputTextLower));
+        return categories.where((option) => option.toLowerCase().contains(inputTextLower));
       },
       onSelected: (selection) {
         controller.text = selection;

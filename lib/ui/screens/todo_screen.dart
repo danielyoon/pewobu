@@ -4,13 +4,13 @@ import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/logic/base_todo_provider.dart';
 
 /*
-* TODO: Make ListTile/Checkbox for each task
-* TODO: Clean ListView
+* TODO: Toggle task is currently broken for dependencies
 * TODO: Make category clickable to see all tasks in one page (?)
 * TODO: Have a separate category for COMPLETED that only shows at the end
 * TODO: Have sort by date due (today, tomorrow, this week, later)
 * TODO: Add animation for FAB
 * TODO: Add longTap edit menu
+* TODO: Task cannot be marked as completed until ALL dependencies are completed
 * */
 
 class TodoScreen extends StatefulWidget {
@@ -101,16 +101,15 @@ class _TodoScreenState extends State<TodoScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(category.toUpperCase(), style: kBodyText),
-                            ListView.builder(
-                              padding: EdgeInsets.zero,
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: tasks.length,
-                              itemBuilder: (context, taskIndex) {
-                                Task task = tasks[taskIndex];
-                                return CustomCheckbox(task: task, provider: widget.provider);
-                              },
+                            Text(category.toUpperCase(), style: kBodyText.copyWith(fontWeight: FontWeight.w700)),
+                            Column(
+                              children: tasks.map((task) {
+                                if (!task.hasDependency) {
+                                  return CustomTaskViewer(task: task, provider: widget.provider);
+                                } else {
+                                  return Container();
+                                }
+                              }).toList(),
                             ),
                           ],
                         );
@@ -213,3 +212,117 @@ class TodoList extends StatelessWidget {
     );
   }
 }
+
+// class MyTreeView extends StatefulWidget {
+//   const MyTreeView({super.key});
+//
+//   @override
+//   State<MyTreeView> createState() => _MyTreeViewState();
+// }
+//
+// class _MyTreeViewState extends State<MyTreeView> {
+//   static const List<MyNode> roots = <MyNode>[
+//     MyNode(
+//       title: 'Root 1',
+//       children: <MyNode>[
+//         MyNode(
+//           title: 'Node 1.1',
+//           children: <MyNode>[
+//             MyNode(title: 'Node 1.1.1'),
+//             MyNode(title: 'Node 1.1.2'),
+//           ],
+//         ),
+//         MyNode(title: 'Node 1.2'),
+//       ],
+//     ),
+//     MyNode(
+//       title: 'Root 2',
+//       children: <MyNode>[
+//         MyNode(
+//           title: 'Node 2.1',
+//           children: <MyNode>[
+//             MyNode(title: 'Node 2.1.1'),
+//           ],
+//         ),
+//         MyNode(title: 'Node 2.2')
+//       ],
+//     ),
+//   ];
+//
+//   late final TreeController<MyNode> treeController;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     treeController = TreeController<MyNode>(
+//       roots: roots,
+//       childrenProvider: (MyNode node) => node.children,
+//     );
+//   }
+//
+//   @override
+//   void dispose() {
+//     treeController.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return TreeView<MyNode>(
+//       padding: EdgeInsets.zero,
+//       shrinkWrap: true,
+//       treeController: treeController,
+//       nodeBuilder: (BuildContext context, TreeEntry<MyNode> entry) {
+//         return MyTreeTile(
+//           key: ValueKey(entry.node),
+//           entry: entry,
+//           onTap: () => treeController.toggleExpansion(entry.node),
+//         );
+//       },
+//     );
+//   }
+// }
+//
+// class MyNode {
+//   const MyNode({
+//     required this.title,
+//     this.children = const <MyNode>[],
+//   });
+//
+//   final String title;
+//   final List<MyNode> children;
+// }
+//
+// class MyTreeTile extends StatelessWidget {
+//   const MyTreeTile({
+//     super.key,
+//     required this.entry,
+//     required this.onTap,
+//   });
+//
+//   final TreeEntry<MyNode> entry;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       child: TreeIndentation(
+//         entry: entry,
+//         guide: const IndentGuide.connectingLines(indent: 48),
+//         child: Padding(
+//           padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+//           child: Row(
+//             children: [
+//               FolderButton(
+//                 isOpen: entry.hasChildren ? entry.isExpanded : null,
+//                 onPressed: entry.hasChildren ? onTap : null,
+//               ),
+//               Text(entry.node.title),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

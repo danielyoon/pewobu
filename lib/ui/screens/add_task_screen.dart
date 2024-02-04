@@ -71,7 +71,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       Task newTask = Task(
         title: _titleController.text,
-        subcategory: _categoryController.text,
+        subcategory: _categoryController.text.isEmpty ? 'Misc' : _categoryController.text,
         created: DateTime.now(),
         dependencies: [],
         due: parsedDate,
@@ -80,6 +80,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       if (dependentTask != null) dependentTask.addDependency(newTask);
       provider.addTask(newTask);
+      provider.saveData('');
       Navigator.pop(context);
     }
     setState(() {

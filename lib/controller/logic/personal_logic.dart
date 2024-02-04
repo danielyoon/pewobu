@@ -4,5 +4,6 @@ class PersonalLogic extends BaseTodoProvider {
   @override
   Future<void> saveData(String category) async {
     await super.saveData('personal');
+    notifyListeners();
   }
 }
