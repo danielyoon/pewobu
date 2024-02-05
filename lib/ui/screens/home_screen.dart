@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:todo_list/controller/logic/auth_logic.dart';
 import 'package:todo_list/controller/logic/bucket_logic.dart';
 import 'package:todo_list/controller/logic/personal_logic.dart';
 import 'package:todo_list/controller/logic/work_logic.dart';
@@ -7,7 +8,7 @@ import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
 /*
-* TODO: Make responsive for web sizes -- add LayoutBuilder
+* TODO: Make responsive for web sizes -- add LayoutBuilder*
 * TODO: Add change image on Drawer
 * TODO: Add change name on Drawer -- Maybe add first-time name screen?
 * TODO: Add dark mode toggle on Drawer
@@ -168,6 +169,8 @@ class _IntroWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthLogic>();
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: kLarge + 4),
       child: Column(
@@ -176,7 +179,7 @@ class _IntroWidget extends StatelessWidget {
           Gap(kSmall),
           CustomCircleAvatar(),
           Gap(kMedium),
-          Text('Hello, Daniel.', style: kHeader),
+          Text('Hello, ${auth.name!}.', style: kHeader),
           Gap(kExtraExtraSmall),
           Text('Good $timeOfDay!', style: kSubHeader),
           Text(

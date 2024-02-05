@@ -10,7 +10,7 @@ import 'package:todo_list/controller/logic/base_todo_provider.dart';
 * TODO: Have sort by date due (today, tomorrow, this week, later)
 * TODO: Add animation for FAB
 * TODO: Add longTap edit menu
-* TODO: Task cannot be marked as completed until ALL dependencies are completed
+* TODO: Task shouldn't be marked as completed until ALL dependencies are completed
 * */
 
 class TodoScreen extends StatefulWidget {
@@ -101,7 +101,10 @@ class _TodoScreenState extends State<TodoScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(category.toUpperCase(), style: kBodyText.copyWith(fontWeight: FontWeight.w700)),
+                            SizedBox(
+                                height: kSmall,
+                                child: Text(category.toUpperCase(),
+                                    style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
                             Column(
                               children: tasks.map((task) {
                                 if (!task.hasDependency) {
@@ -111,6 +114,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                 }
                               }).toList(),
                             ),
+                            Gap(kMedium),
                           ],
                         );
                       } else {
