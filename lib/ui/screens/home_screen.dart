@@ -8,10 +8,9 @@ import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
 /*
-* TODO: Make responsive for web sizes -- add LayoutBuilder*
-* TODO: Add change image on Drawer
-* TODO: Add change name on Drawer -- Maybe add first-time name screen?
-* TODO: Add dark mode toggle on Drawer
+* TODO: Make responsive for tablet sizes -- add LayoutBuilder*
+* TODO: Add design for drawer
+* TODO: Add functionality for Drawer tiles
 * */
 
 class HomeScreen extends StatefulWidget {
@@ -94,7 +93,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Scaffold(
       key: _scaffoldKey,
       appBar: _buildHomeAppBar(),
-      drawer: Drawer(),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(child: Text('TODO-EY', style: kBodyText.copyWith(fontSize: kSmall + 2))),
+            ListTile(title: Text('Change Image')),
+            ListTile(title: Text('Change Name')),
+            ListTile(title: Text('Toggle Dark Mode')),
+          ],
+        ),
+      ),
       extendBodyBehindAppBar: true,
       body: AnimatedBuilder(
         animation: _animation,

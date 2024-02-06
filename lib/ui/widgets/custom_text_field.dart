@@ -18,7 +18,7 @@ class CustomTextField extends StatefulWidget {
     this.hintText,
     this.focusNode,
     this.controller,
-    this.autoFocus = true,
+    this.autoFocus = false,
     this.onPressed,
   });
 

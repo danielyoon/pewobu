@@ -5,10 +5,6 @@ import 'package:todo_list/ui/screens/add_task_screen.dart';
 import 'package:todo_list/ui/screens/home_screen.dart';
 import 'package:todo_list/ui/screens/login_screen.dart';
 
-/*
-* TODO: If user never logged in before (for now, use shared_preferences), navigate to login
-* */
-
 final appRouter = GoRouter(
   initialLocation: '/',
   redirect: _handleRedirect,
@@ -37,8 +33,12 @@ final appRouter = GoRouter(
 );
 
 String? _handleRedirect(BuildContext context, GoRouterState state) {
-  final bool isLoggedIn = Provider.of<AuthLogic>(context, listen: false).isLoggedIn;
+  final bool isLoggedIn =
+      Provider.of<AuthLogic>(context, listen: false).isLoggedIn;
 
-  if (!isLoggedIn) return '/login';
+  debugPrint('Navigating to ${state.fullPath}');
+
+  if (!isLoggedIn && state.fullPath != '/login') return '/login';
+  if (isLoggedIn && state.fullPath == '/login') return '/';
   return null;
 }

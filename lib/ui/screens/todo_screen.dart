@@ -4,7 +4,7 @@ import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/logic/base_todo_provider.dart';
 
 /*
-* TODO: Toggle task is currently broken for dependencies
+* TODO: Toggle task is currently broken for dependencies (?)
 * TODO: Make category clickable to see all tasks in one page (?)
 * TODO: Have a separate category for COMPLETED that only shows at the end
 * TODO: Have sort by date due (today, tomorrow, this week, later)
@@ -75,17 +75,21 @@ class _TodoScreenState extends State<TodoScreen> {
                   Gap(kMedium),
                   Text('${widget.provider.getNumberOfUncompletedTasks()} Tasks',
                       style: kSubHeader.copyWith(color: kGrey)),
-                  Text(widget.title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+                  Text(widget.title,
+                      style:
+                          kHeader.copyWith(color: kTextColor.withOpacity(.6))),
                   Gap(kMedium),
                   Row(
                     children: [
                       Expanded(
                         child: CustomProgressBar(
-                            completionPercentage: widget.provider.getRoundedPercentageOfCompletedTasks(),
+                            completionPercentage: widget.provider
+                                .getRoundedPercentageOfCompletedTasks(),
                             color: ColorUtils.getColorFromTitle(widget.title)),
                       ),
                       Gap(kExtraExtraSmall),
-                      Text('${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
+                      Text(
+                          '${widget.provider.getRoundedPercentageOfCompletedTasks()}%'),
                     ],
                   ),
                   Gap(kSmall),
@@ -96,19 +100,23 @@ class _TodoScreenState extends State<TodoScreen> {
                     itemCount: widget.provider.tasks.length,
                     itemBuilder: (context, index) {
                       if (index < widget.provider.subcategory.length) {
-                        String category = widget.provider.subcategory.elementAt(index);
-                        List<Task> tasks = widget.provider.getSubcategory(widget.provider.subcategory.elementAt(index));
+                        String category =
+                            widget.provider.subcategory.elementAt(index);
+                        List<Task> tasks = widget.provider.getSubcategory(
+                            widget.provider.subcategory.elementAt(index));
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                                height: kSmall,
+                                height: kSmall + 4,
                                 child: Text(category.toUpperCase(),
-                                    style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
+                                    style: kBodyText.copyWith(
+                                        fontWeight: FontWeight.w700))),
                             Column(
                               children: tasks.map((task) {
                                 if (!task.hasDependency) {
-                                  return CustomTaskViewer(task: task, provider: widget.provider);
+                                  return CustomTaskViewer(
+                                      task: task, provider: widget.provider);
                                 } else {
                                   return Container();
                                 }
@@ -192,16 +200,22 @@ class TodoList extends StatelessWidget {
               child: getIconFromTitle(),
             ),
             Gap(kMedium),
-            Text('$uncompletedTasks Tasks', style: kSubHeader.copyWith(color: kGrey)),
-            Text(title, style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
+            Text('$uncompletedTasks Tasks',
+                style: kSubHeader.copyWith(color: kGrey)),
+            Text(title,
+                style: kHeader.copyWith(color: kTextColor.withOpacity(.6))),
             Gap(kMedium),
             Row(
               children: [
                 Expanded(
                   child: CustomProgressBar(
-                      completionPercentage: (uncompletedTasks + completedTasks) == 0
-                          ? 0
-                          : ((uncompletedTasks / (uncompletedTasks + completedTasks)) * 100).round(),
+                      completionPercentage:
+                          (uncompletedTasks + completedTasks) == 0
+                              ? 0
+                              : ((uncompletedTasks /
+                                          (uncompletedTasks + completedTasks)) *
+                                      100)
+                                  .round(),
                       color: ColorUtils.getColorFromTitle(title)),
                 ),
                 Gap(kExtraExtraSmall),
