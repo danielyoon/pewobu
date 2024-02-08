@@ -61,10 +61,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       }
 
       Task? dependentTask;
+      int? dependencyIndex;
       if (_taskController.text.isNotEmpty) {
-        for (Task task in provider.tasks) {
-          if (task.title == _taskController.text) {
-            dependentTask = task;
+        for (int i = 0; i < provider.tasks.length; i++) {
+          if (provider.tasks[i].title == _taskController.text) {
+            dependentTask = provider.tasks[i];
+            dependencyIndex = i;
           }
         }
       }
@@ -75,7 +77,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         created: DateTime.now(),
         dependencies: [],
         due: parsedDate,
-        hasDependency: dependentTask != null ? true : false,
+        dependencyIndex: dependencyIndex,
       );
 
       if (dependentTask != null) dependentTask.addDependency(newTask);

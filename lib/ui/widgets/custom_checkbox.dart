@@ -22,6 +22,9 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
 
     bool isTwoLines = widget.task.title.length > 28;
     bool largeWidth = context.widthPx > 480;
+
+    bool isDependent = widget.task.dependencyIndex != null;
+    bool canCompleteTask = !isDependent || provider.tasks[widget.task.dependencyIndex!].isCompleted;
     return SizedBox(
       height: isTwoLines && !largeWidth ? kLarge + 8 : kLarge,
       child: ListTile(
@@ -34,11 +37,13 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
           child: Checkbox(
             activeColor: ColorUtils.getColorFromTitle(widget.title),
             value: widget.task.isCompleted,
-            onChanged: (bool? value) {
-              setState(() {
-                provider.toggleTask(widget.task);
-              });
-            },
+            onChanged: canCompleteTask
+                ? (bool? value) {
+                    setState(() {
+                      provider.toggleTask(widget.task);
+                    });
+                  }
+                : null,
           ),
         ),
       ),

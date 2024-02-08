@@ -6,13 +6,13 @@ import 'package:todo_list/controller/utils/provider_util.dart';
 
 /*
 * TODO: When a task is completed, move to COMPLETED section UNLESS it has dependencies
-* TODO: Make category clickable to see all tasks in one page (?)
 * TODO: Have a separate category for COMPLETED that only shows at the end
 * TODO: Have sort by date due (today, tomorrow, this week, later)
 * TODO: Add animation for FAB
 * TODO: Add longTap edit menu
 * TODO: Task shouldn't be marked as completed until ALL dependencies are completed
 * TODO: Add underline for each task UNLESS it has dependencies
+* TODO: Make category clickable to see all tasks in one page (?)
 * */
 
 class TodoScreen extends StatefulWidget {
@@ -115,7 +115,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                     style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
                             Column(
                               children: tasks.map((task) {
-                                if (!task.hasDependency) {
+                                if (task.dependencyIndex == null) {
                                   return CustomTaskViewer(task: task, title: widget.title);
                                 } else {
                                   return Container();
