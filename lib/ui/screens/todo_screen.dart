@@ -5,7 +5,6 @@ import 'package:todo_list/controller/logic/base_todo_provider.dart';
 import 'package:todo_list/controller/utils/provider_util.dart';
 
 /*
-* TODO: Toggle task is currently broken for dependencies (?)
 * TODO: When a task is completed, move to COMPLETED section UNLESS it has dependencies
 * TODO: Make category clickable to see all tasks in one page (?)
 * TODO: Have a separate category for COMPLETED that only shows at the end
@@ -117,7 +116,7 @@ class _TodoScreenState extends State<TodoScreen> {
                             Column(
                               children: tasks.map((task) {
                                 if (!task.hasDependency) {
-                                  return CustomTaskViewer(task: task, provider: provider, color: widget.title);
+                                  return CustomTaskViewer(task: task, title: widget.title);
                                 } else {
                                   return Container();
                                 }

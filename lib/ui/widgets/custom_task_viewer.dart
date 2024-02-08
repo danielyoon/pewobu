@@ -1,4 +1,3 @@
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/models/task.dart';
 
@@ -10,23 +9,20 @@ import 'package:todo_list/controller/models/task.dart';
 
 class CustomTaskViewer extends StatelessWidget {
   final Task task;
-  final BaseTodoProvider provider;
-  final String color;
+  final String title;
 
-  const CustomTaskViewer({super.key, required this.task, required this.provider, required this.color});
+  const CustomTaskViewer({super.key, required this.task, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          CustomCheckbox(task: task, provider: provider, color: color),
+          CustomCheckbox(task: task, title: title),
           Padding(
             padding: EdgeInsets.only(left: kLarge),
             child: Column(
-              children: task.dependencies
-                  .map((task) => CustomTaskViewer(task: task, provider: provider, color: color))
-                  .toList(),
+              children: task.dependencies.map((task) => CustomTaskViewer(task: task, title: title)).toList(),
             ),
           ),
         ],

@@ -26,7 +26,7 @@ class BaseTodoProvider extends ChangeNotifier {
   }
 
   void toggleTask(Task task) {
-    if (tasks.contains(task)) {
+    if (tasks.any((e) => e.title == task.title)) {
       task.toggleTask();
       notifyListeners();
     }
