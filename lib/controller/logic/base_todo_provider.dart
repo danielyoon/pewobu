@@ -18,6 +18,13 @@ class BaseTodoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteTask(Task task) {
+    if (tasks.contains(task)) {
+      tasks.remove(task);
+      notifyListeners();
+    }
+  }
+
   void toggleTask(Task task) {
     if (tasks.contains(task)) {
       task.toggleTask();

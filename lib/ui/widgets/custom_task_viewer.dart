@@ -11,19 +11,22 @@ import 'package:todo_list/controller/models/task.dart';
 class CustomTaskViewer extends StatelessWidget {
   final Task task;
   final BaseTodoProvider provider;
+  final String color;
 
-  const CustomTaskViewer({super.key, required this.task, required this.provider});
+  const CustomTaskViewer({super.key, required this.task, required this.provider, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          CustomCheckbox(task: task, provider: provider),
+          CustomCheckbox(task: task, provider: provider, color: color),
           Padding(
             padding: EdgeInsets.only(left: kLarge),
             child: Column(
-              children: task.dependencies.map((task) => CustomTaskViewer(task: task, provider: provider)).toList(),
+              children: task.dependencies
+                  .map((task) => CustomTaskViewer(task: task, provider: provider, color: color))
+                  .toList(),
             ),
           ),
         ],

@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 * TODO: Make responsive for tablet sizes -- add LayoutBuilder*
 * TODO: Add design for drawer
 * TODO: Add functionality for Drawer tiles
+* TODO: Implement dark mode
 * */
 
 class HomeScreen extends StatefulWidget {
@@ -116,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Gap(kToolbarHeight + kSmall),
                 _IntroWidget(
                     timeOfDay: timeOfDay, personal: personal, work: work, bucket: bucket, dateOfToday: dateOfToday),
-                _buildCarousel(personal, work, bucket, availableHeight),
+                _buildCarousel(availableHeight),
                 Gap(kLarge),
               ],
             ),
@@ -126,14 +127,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Expanded _buildCarousel(PersonalLogic personal, WorkLogic work, BucketLogic bucket, double availableHeight) {
+  Expanded _buildCarousel(double availableHeight) {
     return Expanded(
       child: CarouselSlider(
         carouselController: _carouselController,
-        items: [
-          CustomListCard(provider: personal, title: 'Personal'),
-          CustomListCard(provider: work, title: 'Work'),
-          CustomListCard(provider: bucket, title: 'Bucket'),
+        items: const [
+          CustomListCard(title: 'Personal'),
+          CustomListCard(title: 'Work'),
+          CustomListCard(title: 'Bucket'),
         ],
         options: CarouselOptions(
           height: availableHeight,

@@ -1,6 +1,10 @@
 import 'package:todo_list/controller/logic/auth_logic.dart';
 import 'package:todo_list/core_packages.dart';
 
+/*
+* TODO: Implement manual FocusNode to text field
+* */
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -25,8 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleSubmit(BuildContext context) async {
     if (_nameController.text.isEmpty) return;
-    await Provider.of<AuthLogic>(context, listen: false)
-        .login(_nameController.text);
+    await Provider.of<AuthLogic>(context, listen: false).login(_nameController.text);
     appRouter.go('/');
     return;
   }
@@ -43,8 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Enter your name',
-                  style: kHeader.copyWith(fontSize: kMedium)),
+              Text('Enter your name', style: kHeader.copyWith(fontSize: kMedium)),
               CustomTextField(
                 autoFocus: true,
                 controller: _nameController,

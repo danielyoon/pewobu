@@ -71,9 +71,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       Task newTask = Task(
         title: _titleController.text,
-        subcategory: _categoryController.text.isEmpty
-            ? 'Misc'
-            : _categoryController.text,
+        subcategory: _categoryController.text.isEmpty ? 'misc' : _categoryController.text,
         created: DateTime.now(),
         dependencies: [],
         due: parsedDate,
@@ -93,8 +91,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     List<String> categories = widget.provider.subcategory.toList();
-    List<String> titles =
-        widget.provider.tasks.map((task) => task.title).toList();
+    List<String> titles = widget.provider.tasks.map((task) => task.title).toList();
 
     return Scaffold(
       appBar: _buildAppBar(),
@@ -109,8 +106,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('What task are you planning to perform?',
-                      style: kBodyText.copyWith(color: kGrey)),
+                  Text('What task are you planning to perform?', style: kBodyText.copyWith(color: kGrey)),
                   CustomTextField(
                       controller: _titleController,
                       autoFocus: true,
@@ -120,27 +116,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   if (showErrorText) ...[
                     Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: kExtraSmall,
-                            vertical: kExtraExtraSmall),
+                        padding: EdgeInsets.symmetric(horizontal: kExtraSmall, vertical: kExtraExtraSmall),
                         decoration: BoxDecoration(
-                            border: Border.all(color: kError),
-                            borderRadius:
-                                BorderRadius.circular(kExtraExtraSmall)),
-                        child: Text('Please enter a title!',
-                            style: kBodyText.copyWith(color: kError))),
+                            border: Border.all(color: kError), borderRadius: BorderRadius.circular(kExtraExtraSmall)),
+                        child: Text('Please enter a title!', style: kBodyText.copyWith(color: kError))),
                     Gap(kExtraSmall),
                   ],
-                  Text('What category does it fall under?',
-                      style: kBodyText.copyWith(color: kGrey)),
-                  CustomAutocomplete(
-                      categories: categories, controller: _categoryController),
-                  Text('Does it depend on anything else?',
-                      style: kBodyText.copyWith(color: kGrey)),
-                  CustomAutocomplete(
-                      categories: titles, controller: _taskController),
-                  Text('Does it have a due date?',
-                      style: kBodyText.copyWith(color: kGrey)),
+                  Text('What category does it fall under?', style: kBodyText.copyWith(color: kGrey)),
+                  CustomAutocomplete(categories: categories, controller: _categoryController),
+                  Text('Does it depend on anything else?', style: kBodyText.copyWith(color: kGrey)),
+                  CustomAutocomplete(categories: titles, controller: _taskController),
+                  Text('Does it have a due date?', style: kBodyText.copyWith(color: kGrey)),
                   Gap(kSmall),
                   CustomCalendar(controller: _dateController),
                 ],
@@ -160,9 +146,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         icon: Icon(Icons.close, color: kGrey),
         onPressed: () => appRouter.pop(),
       ),
-      title: Text('New Task',
-          style: kSubHeader.copyWith(
-              color: kTextColor.withOpacity(.6), fontSize: kSmall)),
+      title: Text('New Task', style: kSubHeader.copyWith(color: kTextColor.withOpacity(.6), fontSize: kSmall)),
       centerTitle: true,
     );
   }

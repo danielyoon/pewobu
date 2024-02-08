@@ -1,14 +1,14 @@
 import 'package:animations/animations.dart';
 import 'package:todo_list/controller/logic/base_todo_provider.dart';
+import 'package:todo_list/controller/utils/provider_util.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/ui/screens/todo_screen.dart';
 
 class CustomListCard extends StatelessWidget {
-  final BaseTodoProvider provider;
   final String title;
 
-  const CustomListCard({super.key, required this.provider, required this.title});
+  const CustomListCard({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +25,14 @@ class CustomListCard extends StatelessWidget {
       }
     }
 
+    BaseTodoProvider provider = getProvider(context, title);
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: kSmall),
       child: OpenContainer<bool>(
         transitionType: ContainerTransitionType.fade,
         openBuilder: (BuildContext context, VoidCallback _) {
-          return TodoScreen(title: title, provider: provider);
+          return TodoScreen(title: title);
         },
         tappable: false,
         closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kSmall)),
