@@ -4,7 +4,8 @@ class Task {
   DateTime created;
   DateTime? due, completed;
   List<Task> dependencies;
-  int? dependencyIndex;
+  String? dependentOn;
+  int? rootIndex;
 
   Task({
     required this.title,
@@ -14,8 +15,10 @@ class Task {
     this.due,
     this.completed,
     required this.dependencies,
-    this.dependencyIndex,
-  });
+    this.dependentOn,
+    this.rootIndex,
+  }) : assert((dependentOn == null && rootIndex == null) || (dependentOn != null && rootIndex != null),
+            'Both parameters must be set or not set together.');
 
   void toggleTask() {
     isCompleted = !isCompleted;
@@ -35,23 +38,20 @@ class Task {
       'due': due?.toIso8601String(),
       'completed': completed?.toIso8601String(),
       'dependencies': dependencies.map((task) => task.toJson()).toList(),
-      'dependencyIndex': dependencyIndex,
+      'dependentOn': dependentOn,
+      'rootIndex': rootIndex,
     };
   }
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    var dependenciesJson = json['dependencies'] as List?;
-    List<Task> dependencies =
-        dependenciesJson != null ? dependenciesJson.map((taskJson) => Task.fromJson(taskJson)).toList() : [];
-    return Task(
-      title: json['title'],
-      subcategory: json['subcategory'],
-      isCompleted: json['isCompleted'] ?? false,
-      created: DateTime.parse(json['created']),
-      due: json['due'] != null ? DateTime.parse(json['due']) : null,
-      completed: json['completed'] != null ? DateTime.parse(json['completed']) : null,
-      dependencies: dependencies,
-      dependencyIndex: json['dependencyIndex'],
-    );
-  }
+  static Task fromJson(Map<String, dynamic> json) => Task(
+        title: json['title'],
+        subcategory: json['subcategory'],
+        isCompleted: json['isCompleted'],
+        created: DateTime.parse(json['created']),
+        due: json['due'] != null ? DateTime.parse(json['due']) : null,
+        completed: json['completed'] != null ? DateTime.parse(json['completed']) : null,
+        dependencies: (json['dependencies'] as List).map((e) => Task.fromJson(e)).toList(),
+        dependentOn: json['dependentOn'],
+        rootIndex: json['rootIndex'],
+      );
 }

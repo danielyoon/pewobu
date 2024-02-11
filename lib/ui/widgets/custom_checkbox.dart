@@ -7,9 +7,8 @@ import 'package:todo_list/controller/utils/provider_util.dart';
 class CustomCheckbox extends StatefulWidget {
   final String title;
   final Task task;
-  final bool isEnabled;
 
-  const CustomCheckbox({super.key, required this.task, required this.title, this.isEnabled = true});
+  const CustomCheckbox({super.key, required this.task, required this.title});
 
   @override
   State<CustomCheckbox> createState() => _CustomCheckboxState();
@@ -23,12 +22,20 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
     bool isTwoLines = widget.task.title.length > 28;
     bool largeWidth = context.widthPx > 480;
 
-    bool isDependent = widget.task.dependencyIndex != null;
-    bool canCompleteTask = !isDependent || provider.tasks[widget.task.dependencyIndex!].isCompleted;
+    Task? t;
+    bool canCompleteTask = false;
+    bool isDependent = widget.task.dependentOn != null;
+    if (isDependent) {
+      t = provider.findTaskByCriterion(provider.tasks, (Task t) => t.title == widget.task.dependentOn);
+      if (t!.isCompleted) {
+        canCompleteTask = true;
+      }
+    } else {
+      canCompleteTask = true;
+    }
     return SizedBox(
       height: isTwoLines && !largeWidth ? kLarge + 8 : kLarge,
       child: ListTile(
-        enabled: widget.isEnabled,
         contentPadding: EdgeInsets.zero,
         title: Text(widget.task.title),
         leading: SizedBox(
@@ -39,9 +46,7 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
             value: widget.task.isCompleted,
             onChanged: canCompleteTask
                 ? (bool? value) {
-                    setState(() {
-                      provider.toggleTask(widget.task);
-                    });
+                    provider.toggleTask(widget.task);
                   }
                 : null,
           ),

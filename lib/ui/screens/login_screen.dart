@@ -1,10 +1,6 @@
 import 'package:todo_list/controller/logic/auth_logic.dart';
 import 'package:todo_list/core_packages.dart';
 
-/*
-* TODO: Implement manual FocusNode to text field
-* */
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -14,16 +10,21 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _nameController;
+  late final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: '');
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Future.delayed(Duration(milliseconds: 300), () => _focusNode.requestFocus()));
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -48,10 +49,12 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text('Enter your name', style: kHeader.copyWith(fontSize: kMedium)),
               CustomTextField(
-                autoFocus: true,
-                controller: _nameController,
-                onSubmit: (e) => _handleSubmit(context),
-              ),
+                  focusNode: _focusNode,
+                  controller: _nameController,
+                  onSubmit: (e) {
+                    FocusScope.of(context).unfocus();
+                    _handleSubmit(context);
+                  }),
               _buildLoginButton(context),
             ],
           ),

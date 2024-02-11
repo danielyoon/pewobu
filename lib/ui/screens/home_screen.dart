@@ -8,10 +8,10 @@ import 'package:todo_list/core_packages.dart';
 import 'package:intl/intl.dart';
 
 /*
-* TODO: Make responsive for tablet sizes -- add LayoutBuilder*
 * TODO: Add design for drawer
 * TODO: Add functionality for Drawer tiles
 * TODO: Implement dark mode
+* TODO: Make responsive for tablet sizes -- add LayoutBuilder*
 * */
 
 class HomeScreen extends StatefulWidget {
@@ -91,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     double availableHeight =
         MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - 315;
 
+    double width = context.widthPx;
     return Scaffold(
       key: _scaffoldKey,
       appBar: _buildHomeAppBar(),
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(child: Text('TODO-EY', style: kBodyText.copyWith(fontSize: kSmall + 2))),
+            DrawerHeader(child: Text('Pewobu', style: kBodyText.copyWith(fontSize: kSmall + 2))),
             ListTile(title: Text('Change Image')),
             ListTile(title: Text('Change Name')),
             ListTile(title: Text('Toggle Dark Mode')),

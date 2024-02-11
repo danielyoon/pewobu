@@ -3,22 +3,21 @@ import 'package:todo_list/controller/logic/base_todo_provider.dart';
 import 'package:todo_list/controller/utils/color_utils.dart';
 import 'package:todo_list/core_packages.dart';
 import 'package:todo_list/controller/models/task.dart';
+import 'package:todo_list/controller/utils/provider_util.dart';
 
 /*
-* TODO: Make this more responsive for shorter screens
-* TODO: Make it 2 columns (on larger screens) where the second column shows the Task created
-* TODO: Add verification of adding a new Task
 * TODO: Search existing tasks to prevent same title task
 * TODO: Setup a prettier error text
 * TODO: Autocomplete should be fixed to handle both uppercase and lowercase letters
 * TODO: Better design for some fields?
+* TODO: Make this more responsive for shorter screens
+* TODO: Make it 2 columns (on larger screens) where the second column shows the Task created
 * */
 
 class AddTaskScreen extends StatefulWidget {
-  final BaseTodoProvider provider;
   final String title;
 
-  const AddTaskScreen({super.key, required this.provider, required this.title});
+  const AddTaskScreen({super.key, required this.title});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -61,12 +60,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       }
 
       Task? dependentTask;
-      int? dependencyIndex;
+      String? dependentOn;
+      int? rootIndex;
       if (_taskController.text.isNotEmpty) {
-        for (int i = 0; i < provider.tasks.length; i++) {
-          if (provider.tasks[i].title == _taskController.text) {
-            dependentTask = provider.tasks[i];
-            dependencyIndex = i;
+        dependentTask = provider.findTaskByCriterion(provider.tasks, (Task t) => t.title == _taskController.text);
+        dependentOn = dependentTask?.title;
+        if (dependentTask != null) {
+          if (dependentTask.rootIndex != null) {
+            rootIndex = dependentTask.rootIndex;
+          } else {
+            rootIndex = provider.tasks.indexOf(dependentTask);
           }
         }
       }
@@ -77,11 +80,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         created: DateTime.now(),
         dependencies: [],
         due: parsedDate,
-        dependencyIndex: dependencyIndex,
+        dependentOn: dependentOn,
+        rootIndex: rootIndex,
       );
 
-      if (dependentTask != null) dependentTask.addDependency(newTask);
-      provider.addTask(newTask);
+      if (dependentTask != null) {
+        dependentTask.addDependency(newTask);
+      } else {
+        provider.addTask(newTask);
+      }
       provider.saveData('');
       Navigator.pop(context);
     }
@@ -92,9 +99,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> categories = widget.provider.subcategory.toList();
-    List<String> titles = widget.provider.tasks.map((task) => task.title).toList();
+    BaseTodoProvider provider = getProvider(context, widget.title);
 
+    List<String> categories = provider.subcategory.toList();
+    List<String> titles = provider.getAllTitles(provider.tasks);
     return Scaffold(
       appBar: _buildAppBar(),
       extendBodyBehindAppBar: true,
@@ -136,8 +144,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           ),
           Spacer(),
-          _buildFAB(),
+          _buildFAB(provider, context),
         ],
+      ),
+    );
+  }
+
+  SizedBox _buildFAB(BaseTodoProvider provider, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FloatingActionButton.extended(
+        extendedPadding: EdgeInsets.zero,
+        heroTag: '${widget.title}-button',
+        onPressed: () => _handleSubmit(provider, context),
+        label: Icon(Icons.add),
+        backgroundColor: ColorUtils.getColorFromTitle(widget.title),
+        foregroundColor: kWhite,
+        shape: ContinuousRectangleBorder(),
       ),
     );
   }
@@ -150,21 +173,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       ),
       title: Text('New Task', style: kSubHeader.copyWith(color: kTextColor.withOpacity(.6), fontSize: kSmall)),
       centerTitle: true,
-    );
-  }
-
-  SizedBox _buildFAB() {
-    return SizedBox(
-      width: double.infinity,
-      child: FloatingActionButton.extended(
-        extendedPadding: EdgeInsets.zero,
-        heroTag: '${widget.title}-button',
-        onPressed: () => _handleSubmit(widget.provider, context),
-        label: Icon(Icons.add),
-        backgroundColor: ColorUtils.getColorFromTitle(widget.title),
-        foregroundColor: kWhite,
-        shape: ContinuousRectangleBorder(),
-      ),
     );
   }
 }

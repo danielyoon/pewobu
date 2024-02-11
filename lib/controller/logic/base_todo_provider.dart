@@ -15,32 +15,67 @@ class BaseTodoProvider extends ChangeNotifier {
   void addTask(Task task) {
     tasks.add(task);
     subcategory.add(task.subcategory);
+
     notifyListeners();
   }
 
-  void deleteTask(Task task) {
-    if (tasks.contains(task)) {
-      tasks.remove(task);
-      notifyListeners();
+  List<String> getAllTitles(List<Task> tasks) {
+    List<String> allTitles = [];
+
+    void traverseTasks(List<Task> currentTasks) {
+      for (var task in currentTasks) {
+        allTitles.add(task.title);
+        if (task.dependencies.isNotEmpty) {
+          traverseTasks(task.dependencies);
+        }
+      }
     }
+
+    traverseTasks(tasks);
+    return allTitles;
+  }
+
+  Task? findTaskByCriterion(List<Task> tasks, bool Function(Task) criteria) {
+    for (var task in tasks) {
+      if (criteria(task)) {
+        return task;
+      }
+      if (task.dependencies.isNotEmpty) {
+        Task? found = findTaskByCriterion(task.dependencies, criteria);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   void toggleTask(Task task) {
-    if (tasks.any((e) => e.title == task.title)) {
-      task.toggleTask();
-      notifyListeners();
+    Task? currentTask = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
+    currentTask?.toggleTask();
+
+    if (!currentTask!.isCompleted) {
+      void uncheckDependencies(List<Task> dependencies) {
+        for (Task d in dependencies) {
+          if (d.isCompleted == true) {
+            d.toggleTask();
+            if (d.dependencies.isNotEmpty) {
+              uncheckDependencies(d.dependencies);
+            }
+          }
+        }
+      }
+
+      uncheckDependencies(currentTask.dependencies);
     }
+    notifyListeners();
   }
+
+  //TODO: Re-work every function below here
 
   void addDependency(String title, Task task) {
     Task currentTask = tasks.firstWhere((task) => task.title == title);
     currentTask.addDependency(task);
-    notifyListeners();
-  }
-
-  void removeTask(Task task) {
-    tasks.remove(task);
-    if (!tasks.any((t) => t.subcategory == task.subcategory)) subcategory.remove(task.subcategory);
     notifyListeners();
   }
 
@@ -56,6 +91,42 @@ class BaseTodoProvider extends ChangeNotifier {
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
     return tasks.where((task) => task.due != null && !task.isCompleted && task.due!.isAtSameMomentAs(today)).toList();
+  }
+
+  List<Task> getMiscTasks() {
+    List<Task> miscTasks = [];
+
+    for (Task task in tasks) {
+      if (task.subcategory == 'misc') {
+        miscTasks.add(task);
+      }
+    }
+
+    return miscTasks;
+  }
+
+  List<Task> getUncompletedTasks(String category) {
+    List<Task> uncompletedTasks = [];
+
+    for (Task task in tasks) {
+      if (task.subcategory == category && task.dependentOn == null) {
+        uncompletedTasks.add(task);
+      }
+    }
+
+    return uncompletedTasks;
+  }
+
+  List<Task> getCompletedTasks() {
+    List<Task> completedTasks = [];
+
+    for (Task task in tasks) {
+      if (task.isCompleted && _areAllDependenciesCompleted(task)) {
+        completedTasks.add(task);
+      }
+    }
+
+    return completedTasks;
   }
 
   int getRoundedPercentageOfCompletedTasks() {
@@ -81,7 +152,22 @@ class BaseTodoProvider extends ChangeNotifier {
     if (data == null) return;
 
     Map<String, dynamic> map = jsonDecode(data);
-    tasks = List<Task>.from(map['tasks'].map((task) => Task.fromJson(task)));
+    tasks = (map['tasks'] as List).map((taskData) => Task.fromJson(taskData)).toList();
     subcategory = SplayTreeSet<String>.from(map['subcategory']);
+  }
+
+  bool _areAllDependenciesCompleted(Task task) {
+    for (Task dTask in task.dependencies) {
+      if (!dTask.isCompleted || !_areAllDependenciesCompleted(dTask)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void removeTask(Task task) {
+    tasks.remove(task);
+    if (!tasks.any((t) => t.subcategory == task.subcategory)) subcategory.remove(task.subcategory);
+    notifyListeners();
   }
 }
