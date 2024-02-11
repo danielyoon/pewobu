@@ -4,8 +4,11 @@ import 'package:todo_list/core_packages.dart';
 class CustomAutocomplete extends StatelessWidget {
   final List<String> categories;
   final TextEditingController controller;
+  final bool isEnabled;
+  final void Function(String value)? onChanged;
 
-  const CustomAutocomplete({super.key, required this.categories, required this.controller});
+  const CustomAutocomplete(
+      {super.key, required this.categories, required this.controller, this.isEnabled = true, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +36,12 @@ class CustomAutocomplete extends StatelessWidget {
           style: kBodyText,
           controller: fieldTextEditingController,
           focusNode: fieldFocusNode,
+          enabled: isEnabled,
           onSubmitted: (String value) {
             onFieldSubmitted();
             controller.text = value;
           },
-          onChanged: (e) => controller.text = e,
+          onChanged: (e) => onChanged!(controller.text = e),
           decoration: InputDecoration(
             border: InputBorder.none,
             enabledBorder: InputBorder.none,

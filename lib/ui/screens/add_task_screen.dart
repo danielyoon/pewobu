@@ -6,9 +6,7 @@ import 'package:todo_list/controller/models/task.dart';
 import 'package:todo_list/controller/utils/provider_util.dart';
 
 /*
-* TODO: Search existing tasks to prevent same title task
 * TODO: Setup a prettier error text
-* TODO: Autocomplete should be fixed to handle both uppercase and lowercase letters
 * TODO: Better design for some fields?
 * TODO: Make this more responsive for shorter screens
 * TODO: Make it 2 columns (on larger screens) where the second column shows the Task created
@@ -29,7 +27,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   late final TextEditingController _taskController;
   late final TextEditingController _dateController;
 
-  bool showErrorText = false;
+  String errorText = '';
 
   @override
   void initState() {
@@ -51,7 +49,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   void _handleSubmit(BaseTodoProvider provider, BuildContext context) {
-    showErrorText = false;
+    errorText = '';
     if (_titleController.text.isNotEmpty) {
       DateTime? parsedDate;
       DateFormat format = DateFormat('MMM dd yy');
@@ -84,16 +82,24 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         rootIndex: rootIndex,
       );
 
+      bool duplicateExists = false;
       if (dependentTask != null) {
-        dependentTask.addDependency(newTask);
+        duplicateExists = provider.addDependency(newTask);
       } else {
-        provider.addTask(newTask);
+        duplicateExists = provider.addTask(newTask);
+      }
+
+      if (duplicateExists) {
+        setState(() {
+          errorText = 'The same task already exists!';
+        });
+        return;
       }
       provider.saveData('');
       Navigator.pop(context);
     }
     setState(() {
-      showErrorText = true;
+      errorText = 'Please enter a title!';
     });
   }
 
@@ -103,6 +109,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
     List<String> categories = provider.subcategory.toList();
     List<String> titles = provider.getAllTitles(provider.tasks);
+
+    double width = context.widthPx;
     return Scaffold(
       appBar: _buildAppBar(),
       extendBodyBehindAppBar: true,
@@ -121,21 +129,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       controller: _titleController,
                       autoFocus: true,
                       onChanged: (_) => setState(() {
-                            showErrorText = false;
+                            errorText = '';
                           })),
-                  if (showErrorText) ...[
+                  if (errorText.isNotEmpty) ...[
                     Container(
-                        width: double.infinity,
+                        width: width / 2,
                         padding: EdgeInsets.symmetric(horizontal: kExtraSmall, vertical: kExtraExtraSmall),
                         decoration: BoxDecoration(
                             border: Border.all(color: kError), borderRadius: BorderRadius.circular(kExtraExtraSmall)),
-                        child: Text('Please enter a title!', style: kBodyText.copyWith(color: kError))),
+                        child: Text(errorText, style: kBodyText.copyWith(color: kError))),
                     Gap(kExtraSmall),
                   ],
                   Text('What category does it fall under?', style: kBodyText.copyWith(color: kGrey)),
-                  CustomAutocomplete(categories: categories, controller: _categoryController),
+                  CustomAutocomplete(
+                      categories: categories, controller: _categoryController, onChanged: (_) => setState(() {})),
                   Text('Does it depend on anything else?', style: kBodyText.copyWith(color: kGrey)),
-                  CustomAutocomplete(categories: titles, controller: _taskController),
+                  CustomAutocomplete(
+                      categories: titles, controller: _taskController, isEnabled: _categoryController.text.isNotEmpty),
                   Text('Does it have a due date?', style: kBodyText.copyWith(color: kGrey)),
                   Gap(kSmall),
                   CustomCalendar(controller: _dateController),

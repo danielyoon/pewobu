@@ -12,11 +12,15 @@ class BaseTodoProvider extends ChangeNotifier {
 
   final Debouncer _debouncer = Debouncer(delay: Duration(milliseconds: 500));
 
-  void addTask(Task task) {
+  bool addTask(Task task) {
+    Task? t = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
+    if (t != null) return true;
+
     tasks.add(task);
     subcategory.add(task.subcategory);
 
     notifyListeners();
+    return false;
   }
 
   List<String> getAllTitles(List<Task> tasks) {
@@ -71,13 +75,18 @@ class BaseTodoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //TODO: Re-work every function below here
+  bool addDependency(Task task) {
+    Task? t = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
 
-  void addDependency(String title, Task task) {
-    Task currentTask = tasks.firstWhere((task) => task.title == title);
-    currentTask.addDependency(task);
+    if (t != null) return true;
+
+    Task? currentTask = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
+    currentTask?.addDependency(task);
     notifyListeners();
+    return false;
   }
+
+  //TODO: Re-work every function below here
 
   int getNumberOfUncompletedTasks() {
     return tasks.where((task) => !task.isCompleted).length;
