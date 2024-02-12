@@ -47,6 +47,7 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
             onChanged: canCompleteTask
                 ? (bool? value) {
                     provider.toggleTask(widget.task);
+                    provider.saveData(widget.title.toLowerCase());
                   }
                 : null,
           ),

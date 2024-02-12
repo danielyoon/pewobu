@@ -5,15 +5,12 @@ import 'package:todo_list/controller/logic/base_todo_provider.dart';
 import 'package:todo_list/controller/utils/provider_util.dart';
 
 /*
-* TODO: Task shouldn't be marked as completed until ALL dependencies are completed
-* TODO: Third level dependency task doesn't work
-* TODO: Have a separate category for COMPLETED that only shows at the end
-* TODO: Cannot undo middle task
-* TODO: Have sort by date due (today, tomorrow, this week, later)
 * TODO: Add animation for FAB
 * TODO: Add longTap edit menu
+* TODO: Have sort by date due (today, tomorrow, this week, later)
 * TODO: Add underline for each task UNLESS it has dependencies (?)
 * TODO: Make category clickable to see all tasks in one page (?)
+* TODO: Should subtasks be considered part of finishing a "task" (?)
 * */
 
 class TodoScreen extends StatefulWidget {
@@ -35,6 +32,7 @@ class _TodoScreenState extends State<TodoScreen> {
     BaseTodoProvider provider = getProvider(context, widget.title);
     List<Task> miscTasks = provider.getMiscTasks();
     List<Task> completedTasks = provider.getCompletedTasks();
+
     return Scaffold(
       appBar: _buildAppBar(),
       extendBodyBehindAppBar: true,
@@ -89,62 +87,60 @@ class _TodoScreenState extends State<TodoScreen> {
                       );
                     },
                   ),
-                  // miscTasks.isNotEmpty
-                  //     ? ListView.builder(
-                  //         padding: EdgeInsets.zero,
-                  //         physics: NeverScrollableScrollPhysics(),
-                  //         shrinkWrap: true,
-                  //         itemCount: miscTasks.length,
-                  //         itemBuilder: (context, index) {
-                  //           return Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               SizedBox(
-                  //                   height: kSmall + 4,
-                  //                   child: Text('MISC', style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
-                  //               Column(
-                  //                 children: miscTasks.map((task) {
-                  //                   if (task.dependentOn == null) {
-                  //                     return CustomTaskViewer(task: task, title: widget.title);
-                  //                   } else {
-                  //                     return Container();
-                  //                   }
-                  //                 }).toList(),
-                  //               ),
-                  //               Gap(kMedium),
-                  //             ],
-                  //           );
-                  //         },
-                  //       )
-                  //     : Container(),
-                  // completedTasks.isNotEmpty
-                  //     ? ListView.builder(
-                  //         padding: EdgeInsets.zero,
-                  //         physics: NeverScrollableScrollPhysics(),
-                  //         shrinkWrap: true,
-                  //         itemCount: completedTasks.length,
-                  //         itemBuilder: (context, index) {
-                  //           return Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               SizedBox(
-                  //                   height: kSmall + 4,
-                  //                   child: Text('COMPLETED', style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
-                  //               Column(
-                  //                 children: completedTasks.map((task) {
-                  //                   if (task.dependentOn == null) {
-                  //                     return CustomTaskViewer(task: task, title: widget.title);
-                  //                   } else {
-                  //                     return Container();
-                  //                   }
-                  //                 }).toList(),
-                  //               ),
-                  //               Gap(kMedium),
-                  //             ],
-                  //           );
-                  //         },
-                  //       )
-                  //     : Container(),
+                  miscTasks.isNotEmpty
+                      ? ListView.builder(
+                          padding: EdgeInsets.zero,
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: miscTasks.length,
+                          itemBuilder: (context, index) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                    height: kSmall + 4,
+                                    child: Text('MISC', style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
+                                Column(
+                                  children: miscTasks.map((task) {
+                                    if (task.dependentOn == null) {
+                                      return CustomTaskViewer(task: task, title: widget.title);
+                                    } else {
+                                      return Container();
+                                    }
+                                  }).toList(),
+                                ),
+                                Gap(kMedium),
+                              ],
+                            );
+                          },
+                        )
+                      : Container(),
+                  completedTasks.isNotEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: kSmall + 4,
+                              child: Text('COMPLETED', style: kBodyText.copyWith(fontWeight: FontWeight.w700)),
+                            ),
+                            ListView.builder(
+                              padding: EdgeInsets.zero,
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: completedTasks.length,
+                              itemBuilder: (context, index) {
+                                Task task = completedTasks[index];
+                                if (task.dependentOn == null) {
+                                  return CustomTaskViewer(task: task, title: widget.title);
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                            Gap(kMedium),
+                          ],
+                        )
+                      : Container(),
                   Gap(kExtraSmall),
                 ],
               ),

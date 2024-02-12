@@ -86,65 +86,6 @@ class BaseTodoProvider extends ChangeNotifier {
     return false;
   }
 
-  //TODO: Re-work every function below here
-
-  int getNumberOfUncompletedTasks() {
-    return tasks.where((task) => !task.isCompleted).length;
-  }
-
-  List<Task> getSubcategory(String category) {
-    return tasks.where((task) => task.subcategory == category).toList();
-  }
-
-  List<Task> getTasksDueToday() {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-    return tasks.where((task) => task.due != null && !task.isCompleted && task.due!.isAtSameMomentAs(today)).toList();
-  }
-
-  List<Task> getMiscTasks() {
-    List<Task> miscTasks = [];
-
-    for (Task task in tasks) {
-      if (task.subcategory == 'misc') {
-        miscTasks.add(task);
-      }
-    }
-
-    return miscTasks;
-  }
-
-  List<Task> getUncompletedTasks(String category) {
-    List<Task> uncompletedTasks = [];
-
-    for (Task task in tasks) {
-      if (task.subcategory == category && task.dependentOn == null) {
-        uncompletedTasks.add(task);
-      }
-    }
-
-    return uncompletedTasks;
-  }
-
-  List<Task> getCompletedTasks() {
-    List<Task> completedTasks = [];
-
-    for (Task task in tasks) {
-      if (task.isCompleted && _areAllDependenciesCompleted(task)) {
-        completedTasks.add(task);
-      }
-    }
-
-    return completedTasks;
-  }
-
-  int getRoundedPercentageOfCompletedTasks() {
-    if (tasks.isEmpty) return 0;
-    int completedTasks = tasks.where((task) => task.isCompleted).length;
-    double percentage = (completedTasks / tasks.length) * 100;
-    return percentage.round();
-  }
-
   Future<void> saveData(String category) async {
     final prefs = await SharedPreferences.getInstance();
     String data = jsonEncode({
@@ -165,18 +106,105 @@ class BaseTodoProvider extends ChangeNotifier {
     subcategory = SplayTreeSet<String>.from(map['subcategory']);
   }
 
-  bool _areAllDependenciesCompleted(Task task) {
-    for (Task dTask in task.dependencies) {
-      if (!dTask.isCompleted || !_areAllDependenciesCompleted(dTask)) {
-        return false;
+  int getNumberOfUncompletedTasks() {
+    int count = 0;
+
+    void traverseTasks(List<Task> currentTasks) {
+      for (var task in currentTasks) {
+        if (!task.isCompleted) {
+          count++;
+        }
+        if (task.dependencies.isNotEmpty) {
+          traverseTasks(task.dependencies);
+        }
       }
     }
-    return true;
+
+    traverseTasks(tasks);
+    return count;
   }
 
-  void removeTask(Task task) {
-    tasks.remove(task);
-    if (!tasks.any((t) => t.subcategory == task.subcategory)) subcategory.remove(task.subcategory);
-    notifyListeners();
+  List<Task> getTasksDueToday() {
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+
+    List<Task> allTasksDueToday = [];
+
+    void traverseTasks(List<Task> currentTasks) {
+      for (var task in currentTasks) {
+        if (task.due != null && !task.isCompleted && task.due!.isAtSameMomentAs(today)) allTasksDueToday.add(task);
+        if (task.dependencies.isNotEmpty) {
+          traverseTasks(task.dependencies);
+        }
+      }
+    }
+
+    traverseTasks(tasks);
+    return allTasksDueToday;
+  }
+
+  List<Task> getUncompletedTasks(String category) {
+    List<Task> uncompletedTasks = [];
+
+    void traverseTasks(List<Task> currentTasks) {
+      for (var task in currentTasks) {
+        if ((!task.isCompleted || !_allDependenciesCompleted(task)) && task.subcategory != 'misc') {
+          uncompletedTasks.add(task);
+        }
+        if (task.dependencies.isNotEmpty) {
+          traverseTasks(task.dependencies);
+        }
+      }
+    }
+
+    traverseTasks(tasks);
+    return uncompletedTasks;
+  }
+
+  List<Task> getCompletedTasks() {
+    List<Task> getCompletedTasks = [];
+
+    for (var task in tasks) {
+      if ((task.rootIndex != null || task.dependentOn == null) && task.isCompleted && _allDependenciesCompleted(task)) {
+        getCompletedTasks.add(task);
+      }
+    }
+
+    return getCompletedTasks;
+  }
+
+  int getRoundedPercentageOfCompletedTasks() {
+    if (tasks.isEmpty) return 0;
+    int completedTasks = getCompletedTasks().length;
+    int uncompletedTasks = getNumberOfUncompletedTasks();
+
+    double percentage = (completedTasks / (completedTasks + uncompletedTasks)) * 100;
+    return percentage.round();
+  }
+
+  List<Task> getMiscTasks() {
+    List<Task> miscTasks = [];
+
+    void traverseTasks(List<Task> currentTasks) {
+      for (var task in currentTasks) {
+        if (task.subcategory == 'misc' && !task.isCompleted && _allDependenciesCompleted(task)) {
+          miscTasks.add(task);
+        }
+        if (task.dependencies.isNotEmpty) {
+          traverseTasks(task.dependencies);
+        }
+      }
+    }
+
+    traverseTasks(tasks);
+    return miscTasks;
+  }
+
+  bool _allDependenciesCompleted(Task task) {
+    if (task.dependencies.isEmpty) return true;
+    for (Task d in task.dependencies) {
+      if (!d.isCompleted || !_allDependenciesCompleted(d)) return false;
+    }
+    return true;
   }
 }
