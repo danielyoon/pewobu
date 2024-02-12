@@ -84,7 +84,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       bool duplicateExists = false;
       if (dependentTask != null) {
-        duplicateExists = provider.addDependency(newTask);
+        duplicateExists = provider.addDependency(newTask, dependentOn!);
       } else {
         duplicateExists = provider.addTask(newTask);
       }

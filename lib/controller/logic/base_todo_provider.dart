@@ -23,6 +23,28 @@ class BaseTodoProvider extends ChangeNotifier {
     return false;
   }
 
+  void removeTask(Task task) {
+    bool traverseAndRemove(List<Task> currentTasks, String title) {
+      for (int i = 0; i < currentTasks.length; i++) {
+        if (currentTasks[i].title == title) {
+          currentTasks.removeAt(i);
+          bool noOtherTaskWithSubcategory = !tasks.any((t) => t.subcategory == task.subcategory);
+          if (noOtherTaskWithSubcategory) {
+            subcategory.remove(task.subcategory);
+          }
+          return true;
+        }
+        if (traverseAndRemove(currentTasks[i].dependencies, title)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    traverseAndRemove(tasks, task.title);
+    notifyListeners();
+  }
+
   List<String> getAllTitles(List<Task> tasks) {
     List<String> allTitles = [];
 
@@ -37,21 +59,6 @@ class BaseTodoProvider extends ChangeNotifier {
 
     traverseTasks(tasks);
     return allTitles;
-  }
-
-  Task? findTaskByCriterion(List<Task> tasks, bool Function(Task) criteria) {
-    for (var task in tasks) {
-      if (criteria(task)) {
-        return task;
-      }
-      if (task.dependencies.isNotEmpty) {
-        Task? found = findTaskByCriterion(task.dependencies, criteria);
-        if (found != null) {
-          return found;
-        }
-      }
-    }
-    return null;
   }
 
   void toggleTask(Task task) {
@@ -75,12 +82,11 @@ class BaseTodoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool addDependency(Task task) {
+  bool addDependency(Task task, String title) {
     Task? t = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
-
     if (t != null) return true;
 
-    Task? currentTask = findTaskByCriterion(tasks, (Task t) => t.title == task.title);
+    Task? currentTask = findTaskByCriterion(tasks, (Task t) => t.title == title);
     currentTask?.addDependency(task);
     notifyListeners();
     return false;
@@ -148,7 +154,9 @@ class BaseTodoProvider extends ChangeNotifier {
 
     void traverseTasks(List<Task> currentTasks) {
       for (var task in currentTasks) {
-        if ((!task.isCompleted || !_allDependenciesCompleted(task)) && task.subcategory != 'misc') {
+        if ((!task.isCompleted || !_allDependenciesCompleted(task)) &&
+            task.subcategory != 'misc' &&
+            task.subcategory == category) {
           uncompletedTasks.add(task);
         }
         if (task.dependencies.isNotEmpty) {
@@ -198,6 +206,21 @@ class BaseTodoProvider extends ChangeNotifier {
 
     traverseTasks(tasks);
     return miscTasks;
+  }
+
+  Task? findTaskByCriterion(List<Task> tasks, bool Function(Task) criteria) {
+    for (var task in tasks) {
+      if (criteria(task)) {
+        return task;
+      }
+      if (task.dependencies.isNotEmpty) {
+        Task? found = findTaskByCriterion(task.dependencies, criteria);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   bool _allDependenciesCompleted(Task task) {

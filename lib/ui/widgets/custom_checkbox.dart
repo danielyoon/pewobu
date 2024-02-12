@@ -35,21 +35,28 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
     }
     return SizedBox(
       height: isTwoLines && !largeWidth ? kLarge + 8 : kLarge,
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(widget.task.title),
-        leading: SizedBox(
-          height: kMedium,
-          width: kMedium,
-          child: Checkbox(
-            activeColor: ColorUtils.getColorFromTitle(widget.title),
-            value: widget.task.isCompleted,
-            onChanged: canCompleteTask
-                ? (bool? value) {
-                    provider.toggleTask(widget.task);
-                    provider.saveData(widget.title.toLowerCase());
-                  }
-                : null,
+      child: Theme(
+        data: ThemeData(splashColor: Colors.transparent, highlightColor: Colors.transparent),
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(widget.task.title),
+          onLongPress: () {
+            provider.removeTask(widget.task);
+            provider.saveData(widget.title.toLowerCase());
+          },
+          leading: SizedBox(
+            height: kMedium,
+            width: kMedium,
+            child: Checkbox(
+              activeColor: ColorUtils.getColorFromTitle(widget.title),
+              value: widget.task.isCompleted,
+              onChanged: canCompleteTask
+                  ? (bool? value) {
+                      provider.toggleTask(widget.task);
+                      provider.saveData(widget.title.toLowerCase());
+                    }
+                  : null,
+            ),
           ),
         ),
       ),

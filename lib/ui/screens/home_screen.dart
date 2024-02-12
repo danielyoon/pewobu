@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 /*
 * TODO: Add design for drawer
+* TODO: Add animationController to ListCard to jump to page
 * TODO: Add functionality for Drawer tiles
 * TODO: Implement dark mode
 * TODO: Make responsive for tablet sizes -- add LayoutBuilder*
