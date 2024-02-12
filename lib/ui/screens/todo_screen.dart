@@ -62,18 +62,15 @@ class _TodoScreenState extends State<TodoScreen> {
                     itemCount: provider.subcategory.length,
                     itemBuilder: (context, index) {
                       List<Task> uncompletedTasks = provider.getUncompletedTasks(provider.subcategory.elementAt(index));
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          provider.subcategory.elementAt(index) == 'misc'
-                              ? Container()
-                              : SizedBox(
-                                  height: kSmall + 4,
-                                  child: Text(provider.subcategory.elementAt(index).toUpperCase(),
-                                      style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
-                          provider.subcategory.elementAt(index) == 'misc'
-                              ? Container()
-                              : Column(
+                      return (provider.subcategory.elementAt(index) != 'misc')
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                    height: kSmall + 4,
+                                    child: Text(provider.subcategory.elementAt(index).toUpperCase(),
+                                        style: kBodyText.copyWith(fontWeight: FontWeight.w700))),
+                                Column(
                                   children: uncompletedTasks.map((task) {
                                     if (task.dependentOn == null) {
                                       return CustomTaskViewer(task: task, title: widget.title);
@@ -82,9 +79,10 @@ class _TodoScreenState extends State<TodoScreen> {
                                     }
                                   }).toList(),
                                 ),
-                          Gap(kMedium),
-                        ],
-                      );
+                                Gap(kExtraExtraSmall),
+                              ],
+                            )
+                          : Container();
                     },
                   ),
                   miscTasks.isNotEmpty
@@ -109,7 +107,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                     }
                                   }).toList(),
                                 ),
-                                Gap(kMedium),
+                                Gap(kExtraExtraSmall),
                               ],
                             );
                           },
@@ -137,7 +135,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                 }
                               },
                             ),
-                            Gap(kMedium),
+                            Gap(kExtraExtraSmall),
                           ],
                         )
                       : Container(),

@@ -33,31 +33,41 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
     } else {
       canCompleteTask = true;
     }
-    return SizedBox(
-      height: isTwoLines && !largeWidth ? kLarge + 8 : kLarge,
-      child: Theme(
-        data: ThemeData(splashColor: Colors.transparent, highlightColor: Colors.transparent),
-        child: ListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(widget.task.title),
-          onLongPress: () {
-            provider.removeTask(widget.task);
-            provider.saveData(widget.title.toLowerCase());
-          },
-          leading: SizedBox(
-            height: kMedium,
-            width: kMedium,
-            child: Checkbox(
-              activeColor: ColorUtils.getColorFromTitle(widget.title),
-              value: widget.task.isCompleted,
-              onChanged: canCompleteTask
-                  ? (bool? value) {
-                      provider.toggleTask(widget.task);
-                      provider.saveData(widget.title.toLowerCase());
-                    }
-                  : null,
+    return GestureDetector(
+      onLongPress: () {
+        provider.removeTask(widget.task);
+        provider.saveData(widget.title.toLowerCase());
+      },
+      child: Container(
+        color: Colors.transparent, // Makes the entire container clickable
+        height: isTwoLines && !largeWidth ? kLarge + 8 : kLarge + 2,
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              height: kMedium,
+              width: kMedium,
+              child: Checkbox(
+                activeColor: ColorUtils.getColorFromTitle(widget.title),
+                value: widget.task.isCompleted,
+                onChanged: canCompleteTask
+                    ? (bool? value) {
+                        provider.toggleTask(widget.task);
+                        provider.saveData(widget.title.toLowerCase());
+                      }
+                    : null,
+              ),
             ),
-          ),
+            SizedBox(width: 8), // Spacing between checkbox and text
+            Expanded(
+              child: Text(
+                widget.task.title,
+                style: TextStyle(
+                    // Add text style if needed
+                    ),
+              ),
+            ),
+            // Add trailing widgets if needed
+          ],
         ),
       ),
     );
