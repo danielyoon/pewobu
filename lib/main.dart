@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:todo_list/controller/logic/auth_logic.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/logic/bucket_logic.dart';
-import 'package:todo_list/controller/logic/personal_logic.dart';
-import 'package:todo_list/controller/logic/work_logic.dart';
+import 'package:pewobu/controller/logic/auth_logic.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/logic/bucket_logic.dart';
+import 'package:pewobu/controller/logic/personal_logic.dart';
+import 'package:pewobu/controller/logic/work_logic.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,13 +26,13 @@ void main() async {
         ChangeNotifierProvider(create: (context) => workLogic),
         ChangeNotifierProvider(create: (context) => bucketLogic),
       ],
-      child: const NoNameList(),
+      child: const Pewobu(),
     ),
   );
 }
 
-class NoNameList extends StatelessWidget {
-  const NoNameList({super.key});
+class Pewobu extends StatelessWidget {
+  const Pewobu({super.key});
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(

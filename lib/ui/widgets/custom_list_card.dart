@@ -1,9 +1,9 @@
 import 'package:animations/animations.dart';
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
-import 'package:todo_list/controller/utils/provider_util.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/utils/color_utils.dart';
-import 'package:todo_list/ui/screens/todo_screen.dart';
+import 'package:pewobu/controller/logic/base_todo_provider.dart';
+import 'package:pewobu/controller/utils/provider_util.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/utils/color_utils.dart';
+import 'package:pewobu/ui/screens/todo_screen.dart';
 
 class CustomListCard extends StatelessWidget {
   final String title;

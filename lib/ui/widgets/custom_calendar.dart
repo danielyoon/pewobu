@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:todo_list/core_packages.dart';
+import 'package:pewobu/core_packages.dart';
 
 class CustomCalendar extends StatefulWidget {
   final TextEditingController controller;
@@ -43,8 +43,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
         }
       },
       child: ConstrainedBox(
-        constraints:
-            BoxConstraints(maxWidth: width > 500 ? width / 2.5 : width),
+        constraints: BoxConstraints(maxWidth: width > 500 ? width / 2.5 : width),
         child: Container(
           padding: EdgeInsets.only(bottom: kExtraExtraSmall),
           decoration: BoxDecoration(

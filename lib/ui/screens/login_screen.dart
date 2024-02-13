@@ -1,5 +1,5 @@
-import 'package:todo_list/controller/logic/auth_logic.dart';
-import 'package:todo_list/core_packages.dart';
+import 'package:pewobu/controller/logic/auth_logic.dart';
+import 'package:pewobu/core_packages.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

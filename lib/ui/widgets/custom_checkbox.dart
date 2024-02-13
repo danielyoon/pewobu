@@ -1,8 +1,8 @@
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
-import 'package:todo_list/controller/utils/color_utils.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/models/task.dart';
-import 'package:todo_list/controller/utils/provider_util.dart';
+import 'package:pewobu/controller/logic/base_todo_provider.dart';
+import 'package:pewobu/controller/utils/color_utils.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/models/task.dart';
+import 'package:pewobu/controller/utils/provider_util.dart';
 
 class CustomCheckbox extends StatefulWidget {
   final String title;
@@ -59,12 +59,7 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
             ),
             SizedBox(width: 8), // Spacing between checkbox and text
             Expanded(
-              child: Text(
-                widget.task.title,
-                style: TextStyle(
-                    // Add text style if needed
-                    ),
-              ),
+              child: Text(widget.task.title, style: kBodyText.copyWith(color: Colors.black.withOpacity(.6))),
             ),
             // Add trailing widgets if needed
           ],

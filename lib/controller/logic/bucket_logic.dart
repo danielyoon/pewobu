@@ -1,4 +1,4 @@
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
+import 'package:pewobu/controller/logic/base_todo_provider.dart';
 
 class BucketLogic extends BaseTodoProvider {
   @override

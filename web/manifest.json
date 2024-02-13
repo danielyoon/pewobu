@@ -1,6 +1,6 @@
 {
-    "name": "todo_list",
-    "short_name": "todo_list",
+    "name": "pewobu",
+    "short_name": "pewobu",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

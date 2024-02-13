@@ -2,9 +2,9 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_list/controller/models/task.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/utils/debouncer.dart';
+import 'package:pewobu/controller/models/task.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/utils/debouncer.dart';
 
 class BaseTodoProvider extends ChangeNotifier {
   List<Task> tasks = [];
@@ -45,12 +45,12 @@ class BaseTodoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> getAllTitles(List<Task> tasks) {
+  List<String> getAllTitles(List<Task> tasks, String category) {
     List<String> allTitles = [];
 
     void traverseTasks(List<Task> currentTasks) {
       for (var task in currentTasks) {
-        allTitles.add(task.title);
+        if (task.subcategory == category) allTitles.add(task.title);
         if (task.dependencies.isNotEmpty) {
           traverseTasks(task.dependencies);
         }

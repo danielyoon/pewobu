@@ -1,8 +1,8 @@
-import 'package:todo_list/controller/logic/auth_logic.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/ui/screens/add_task_screen.dart';
-import 'package:todo_list/ui/screens/home_screen.dart';
-import 'package:todo_list/ui/screens/login_screen.dart';
+import 'package:pewobu/controller/logic/auth_logic.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/ui/screens/add_task_screen.dart';
+import 'package:pewobu/ui/screens/home_screen.dart';
+import 'package:pewobu/ui/screens/login_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',

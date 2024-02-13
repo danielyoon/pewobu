@@ -1,5 +1,5 @@
 import 'package:google_fonts/google_fonts.dart';
-import 'package:todo_list/core_packages.dart';
+import 'package:pewobu/core_packages.dart';
 
 Color kPrimary = Color(0xFF30115b);
 Color kSecondary = Color(0XFFB22F4A);

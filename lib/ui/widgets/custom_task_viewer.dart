@@ -1,5 +1,5 @@
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/models/task.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/models/task.dart';
 
 /*
 * TODO: Draw a grey arrow of some sort showing connection between tasks
@@ -20,9 +20,7 @@ class CustomTaskViewer extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: kLarge),
             child: Column(
-              children: task.dependencies
-                  .map((task) => CustomTaskViewer(task: task, title: title))
-                  .toList(),
+              children: task.dependencies.map((task) => CustomTaskViewer(task: task, title: title)).toList(),
             ),
           ),
         ],

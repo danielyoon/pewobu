@@ -1,8 +1,8 @@
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
-import 'package:todo_list/controller/logic/bucket_logic.dart';
-import 'package:todo_list/controller/logic/personal_logic.dart';
-import 'package:todo_list/controller/logic/work_logic.dart';
-import 'package:todo_list/core_packages.dart';
+import 'package:pewobu/controller/logic/base_todo_provider.dart';
+import 'package:pewobu/controller/logic/bucket_logic.dart';
+import 'package:pewobu/controller/logic/personal_logic.dart';
+import 'package:pewobu/controller/logic/work_logic.dart';
+import 'package:pewobu/core_packages.dart';
 
 BaseTodoProvider getProvider(BuildContext context, String type) {
   switch (type.toLowerCase()) {

@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
-import 'package:todo_list/controller/logic/base_todo_provider.dart';
-import 'package:todo_list/controller/utils/color_utils.dart';
-import 'package:todo_list/core_packages.dart';
-import 'package:todo_list/controller/models/task.dart';
-import 'package:todo_list/controller/utils/provider_util.dart';
+import 'package:pewobu/controller/logic/base_todo_provider.dart';
+import 'package:pewobu/controller/utils/color_utils.dart';
+import 'package:pewobu/core_packages.dart';
+import 'package:pewobu/controller/models/task.dart';
+import 'package:pewobu/controller/utils/provider_util.dart';
 
 /*
 * TODO: Setup a prettier error text
@@ -108,7 +108,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     BaseTodoProvider provider = getProvider(context, widget.title);
 
     List<String> categories = provider.subcategory.toList();
-    List<String> titles = provider.getAllTitles(provider.tasks);
+    List<String> titles = provider.getAllTitles(provider.tasks, _categoryController.text);
 
     double width = context.widthPx;
     return Scaffold(
