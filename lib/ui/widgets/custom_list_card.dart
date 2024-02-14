@@ -7,8 +7,9 @@ import 'package:pewobu/ui/screens/todo_screen.dart';
 
 class CustomListCard extends StatelessWidget {
   final String title;
+  final Function(String) onTap;
 
-  const CustomListCard({super.key, required this.title});
+  const CustomListCard({super.key, required this.title, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,10 @@ class CustomListCard extends StatelessWidget {
         closedBuilder: (BuildContext context, VoidCallback openContainer) {
           return InkWell(
             borderRadius: BorderRadius.circular(kMedium),
-            onTap: openContainer,
+            onTap: () {
+              onTap(title);
+              openContainer();
+            },
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: kSmall),
               child: Column(

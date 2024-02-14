@@ -5,12 +5,8 @@ import 'package:pewobu/controller/logic/base_todo_provider.dart';
 import 'package:pewobu/controller/utils/provider_util.dart';
 
 /*
-* TODO: Add animation for FAB
 * TODO: Add longTap edit menu
 * TODO: Have sort by date due (today, tomorrow, this week, later)
-* TODO: Add underline for each task UNLESS it has dependencies (?)
-* TODO: Make category clickable to see all tasks in one page (?)
-* TODO: Should subtasks be considered part of finishing a "task" (?)
 * */
 
 class TodoScreen extends StatefulWidget {

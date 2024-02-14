@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 
 /*
 * TODO: Add design for drawer
-* TODO: Add animationController to ListCard to jump to page
 * TODO: Add functionality for Drawer tiles
 * TODO: Implement dark mode
 * TODO: Make responsive for tablet sizes -- add LayoutBuilder*
@@ -83,6 +82,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _backgroundColor.value = ColorUtils.getColorFromIndex(index);
   }
 
+  void animateToCard(String title) {
+    if (title == 'Personal') _carouselController.jumpToPage(0);
+    if (title == 'Work') _carouselController.jumpToPage(1);
+    if (title == 'Bucket') _carouselController.jumpToPage(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     final personal = context.watch<PersonalLogic>();
@@ -91,8 +96,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     double availableHeight =
         MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - 315;
-
-    double width = context.widthPx;
     return Scaffold(
       key: _scaffoldKey,
       appBar: _buildHomeAppBar(),
@@ -133,10 +136,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Expanded(
       child: CarouselSlider(
         carouselController: _carouselController,
-        items: const [
-          CustomListCard(title: 'Personal'),
-          CustomListCard(title: 'Work'),
-          CustomListCard(title: 'Bucket'),
+        items: [
+          CustomListCard(title: 'Personal', onTap: animateToCard),
+          CustomListCard(title: 'Work', onTap: animateToCard),
+          CustomListCard(title: 'Bucket', onTap: animateToCard),
         ],
         options: CarouselOptions(
           height: availableHeight,
@@ -190,7 +193,7 @@ class _IntroWidget extends StatelessWidget {
         children: [
           Gap(kSmall),
           CustomCircleAvatar(),
-          Gap(kMedium),
+          Gap(kSmall),
           Text('Hello, ${auth.name!}.', style: kHeader),
           Gap(kExtraExtraSmall),
           Text('Good $timeOfDay!', style: kSubHeader),

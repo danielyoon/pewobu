@@ -38,10 +38,10 @@ class CustomAutocomplete extends StatelessWidget {
           focusNode: fieldFocusNode,
           enabled: isEnabled,
           onSubmitted: (String value) {
-            onFieldSubmitted();
             controller.text = value;
+            onFieldSubmitted();
           },
-          onChanged: (e) => onChanged!(controller.text = e),
+          onChanged: (e) => onChanged?.call(controller.text = e),
           decoration: InputDecoration(
             border: InputBorder.none,
             enabledBorder: InputBorder.none,

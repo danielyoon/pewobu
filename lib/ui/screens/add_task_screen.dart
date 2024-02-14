@@ -37,6 +37,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _categoryController = TextEditingController(text: '');
     _taskController = TextEditingController(text: '');
     _dateController = TextEditingController(text: 'No');
+
+    _categoryController.addListener(_updateTitlesBasedOnCategory);
   }
 
   @override
@@ -45,7 +47,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     _categoryController.dispose();
     _taskController.dispose();
     _dateController.dispose();
+
+    _categoryController.removeListener(_updateTitlesBasedOnCategory);
     super.dispose();
+  }
+
+  void _updateTitlesBasedOnCategory() {
+    setState(() {});
   }
 
   void _handleSubmit(BaseTodoProvider provider, BuildContext context) {
@@ -108,7 +116,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     BaseTodoProvider provider = getProvider(context, widget.title);
 
     List<String> categories = provider.subcategory.toList();
-    List<String> titles = provider.getAllTitles(provider.tasks, _categoryController.text);
+    List<String> titles;
+    if (_categoryController.text.isNotEmpty) {
+      titles = provider.getAllTitles(provider.tasks, _categoryController.text);
+    } else {
+      titles = [];
+    }
 
     double width = context.widthPx;
     return Scaffold(

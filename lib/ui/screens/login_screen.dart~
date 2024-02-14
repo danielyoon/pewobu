@@ -37,6 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = context.widthPx;
+
     return Scaffold(
       body: Center(
         child: ConstrainedBox(
